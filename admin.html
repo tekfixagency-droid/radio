@@ -360,121 +360,179 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
     </div>
   </div>
 
-  <!-- SCHEDULE -->
-  <div class="page" id="page-schedule">
-    <div class="page-title">📅 Schedule Manager</div>
-    <div class="form-card">
-      <h3>➕ Add Schedule Block</h3>
-      <div class="form-row">
-        <div class="form-field">
-          <label>Section</label>
-          <select id="sched-section">
-            <option value="music">Music</option>
-            <option value="sermons">Sermons</option>
-            <option value="kids">Kids</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Days</label>
-          <select id="sched-days" multiple style="height:106px">
-            <option value="mon" selected>Monday</option>
-            <option value="tue" selected>Tuesday</option>
-            <option value="wed" selected>Wednesday</option>
-            <option value="thu" selected>Thursday</option>
-            <option value="fri" selected>Friday</option>
-            <option value="sat" selected>Saturday</option>
-            <option value="sun" selected>Sunday</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-field">
-          <label>Start Hour (0–23)</label>
-          <input type="number" id="sched-start" min="0" max="23" value="0"/>
-        </div>
-        <div class="form-field">
-          <label>End Hour (1–24)</label>
-          <input type="number" id="sched-end" min="1" max="24" value="22"/>
-        </div>
-      </div>
-      <button class="btn-full" onclick="saveScheduleBlock()">✓ Save Block</button>
-    </div>
+<!-- SCHEDULE -->
+<div class="page" id="page-schedule">
+  <div class="page-title">📅 Schedule Manager</div>
 
-    <div class="sched-legend">
-      <div class="sched-leg-item">
-        <div class="sched-leg-dot" style="background:rgba(192,132,252,.6)"></div> Music
+  <!-- ADD BLOCK FORM -->
+  <div class="form-card">
+    <h3>➕ Add Schedule Block</h3>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Section</label>
+        <select id="sched-section">
+          <option value="music">Music</option>
+          <option value="sermons">Sermons</option>
+          <option value="kids">Kids</option>
+        </select>
       </div>
-      <div class="sched-leg-item">
-        <div class="sched-leg-dot" style="background:rgba(167,139,250,.6)"></div> Sermons
-      </div>
-      <div class="sched-leg-item">
-        <div class="sched-leg-dot" style="background:rgba(244,114,182,.6)"></div> Kids
+      <div class="form-field">
+        <label>Days</label>
+        <select id="sched-days" multiple style="height:106px">
+          <option value="mon" selected>Monday</option>
+          <option value="tue" selected>Tuesday</option>
+          <option value="wed" selected>Wednesday</option>
+          <option value="thu" selected>Thursday</option>
+          <option value="fri" selected>Friday</option>
+          <option value="sat" selected>Saturday</option>
+          <option value="sun" selected>Sunday</option>
+        </select>
       </div>
     </div>
-    <div id="schedule-blocks-list"></div>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Start Hour (0–23)</label>
+        <input type="number" id="sched-start" min="0" max="23" value="0"/>
+      </div>
+      <div class="form-field">
+        <label>End Hour (1–24)</label>
+        <input type="number" id="sched-end" min="1" max="24" value="22"/>
+      </div>
+    </div>
+    <button class="btn-full" onclick="saveScheduleBlock()">✓ Save Block</button>
   </div>
+
+  <!-- TEMPLATES ROW -->
+  <div class="form-card">
+    <h3>🚀 Quick Templates</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Click a template to instantly fill the form above, then Save.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+      <button class="btn-secondary btn-sm" style="padding:10px;font-size:11px;border-radius:8px" onclick="applyTemplate('workhours')">
+        💼 Work Hours<br><span style="font-weight:400;opacity:.6;font-size:10px">Mon–Fri 8:00–18:00</span>
+      </button>
+      <button class="btn-secondary btn-sm" style="padding:10px;font-size:11px;border-radius:8px" onclick="applyTemplate('morning')">
+        🌅 Morning Worship<br><span style="font-weight:400;opacity:.6;font-size:10px">All days 5:00–9:00</span>
+      </button>
+      <button class="btn-secondary btn-sm" style="padding:10px;font-size:11px;border-radius:8px" onclick="applyTemplate('evening')">
+        🌙 Evening Sermons<br><span style="font-weight:400;opacity:.6;font-size:10px">All days 18:00–22:00</span>
+      </button>
+      <button class="btn-secondary btn-sm" style="padding:10px;font-size:11px;border-radius:8px" onclick="applyTemplate('kids')">
+        👦 Kids Time<br><span style="font-weight:400;opacity:.6;font-size:10px">Sat–Sun 9:00–12:00</span>
+      </button>
+      <button class="btn-secondary btn-sm" style="padding:10px;font-size:11px;border-radius:8px" onclick="applyTemplate('allday')">
+        📻 All Day Music<br><span style="font-weight:400;opacity:.6;font-size:10px">All days 0:00–24:00</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="sched-legend">
+    <div class="sched-leg-item">
+      <div class="sched-leg-dot" style="background:rgba(192,132,252,.6)"></div> Music
+    </div>
+    <div class="sched-leg-item">
+      <div class="sched-leg-dot" style="background:rgba(167,139,250,.6)"></div> Sermons
+    </div>
+    <div class="sched-leg-item">
+      <div class="sched-leg-dot" style="background:rgba(244,114,182,.6)"></div> Kids
+    </div>
+  </div>
+
+  <!-- BLOCKS LIST -->
+  <div id="schedule-blocks-list"></div>
+</div>
 
   <!-- SETTINGS -->
-  <div class="page" id="page-settings">
-    <div class="page-title">⚙️ Settings</div>
-    <div class="form-card">
-      <h3>🌐 Site Configuration</h3>
-      <div class="form-row">
-        <div class="form-field">
-          <label>Site Title</label>
-          <input type="text" id="set-title" placeholder="MasalioRadio"/>
-        </div>
-        <div class="form-field">
-          <label>WhatsApp Number</label>
-          <input type="text" id="set-wa" placeholder="254722628151"/>
-        </div>
-      </div>
-      <div class="form-row full">
-        <div class="form-field">
-          <label>Logo Image URL (shown on client player)</label>
-          <input type="url" id="set-logo" placeholder="https://example.com/logo.png" oninput="previewLogo(this.value)"/>
-          <div class="logo-preview" id="logoPreview" style="display:none">
-            <img id="logoPreviewImg" src="" alt="Logo preview"/>
-            <span>Live preview — this will appear on the player page</span>
-          </div>
-        </div>
-      </div>
-      <div class="form-row full">
-        <div class="form-field">
-          <label>Prayer Requests URL</label>
-          <input type="url" id="set-prayer" placeholder="https://..."/>
-        </div>
-      </div>
-      <div class="form-row full">
-        <div class="form-field">
-          <label>Testimonies URL</label>
-          <input type="url" id="set-testimony" placeholder="https://..."/>
-        </div>
-      </div>
-      <div class="form-row full">
-        <div class="form-field">
-          <label>Donate URL</label>
-          <input type="url" id="set-donate" placeholder="https://..."/>
-        </div>
-      </div>
-      <button class="btn-full" onclick="saveSettings()">✓ Save Settings</button>
-    </div>
+<div class="page" id="page-settings">
+  <div class="page-title">⚙️ Settings</div>
 
-    <div class="form-card">
-      <h3>🔑 Change Admin Password</h3>
-      <div class="form-row">
-        <div class="form-field">
-          <label>New Password</label>
-          <input type="password" id="new-pwd" placeholder="Enter new password"/>
-        </div>
-        <div class="form-field">
-          <label>Confirm Password</label>
-          <input type="password" id="confirm-pwd" placeholder="Repeat new password"/>
+  <!-- SITE CONFIG -->
+  <div class="form-card">
+    <h3>🌐 Site Configuration</h3>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Site Title</label>
+        <input type="text" id="set-title" placeholder="MasalioRadio"/>
+      </div>
+      <div class="form-field">
+        <label>WhatsApp Number</label>
+        <input type="text" id="set-wa" placeholder="254722628151"/>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-field">
+        <label>Logo Image URL</label>
+        <input type="url" id="set-logo" placeholder="https://example.com/logo.png" oninput="previewLogo(this.value)"/>
+        <div class="logo-preview" id="logoPreview" style="display:none">
+          <img id="logoPreviewImg" src="" alt="Logo preview"/>
+          <span>Live preview</span>
         </div>
       </div>
-      <button class="btn-full" onclick="changePassword()">🔒 Update Password</button>
     </div>
+    <div class="form-row full">
+      <div class="form-field">
+        <label>Prayer Requests URL</label>
+        <input type="url" id="set-prayer" placeholder="https://..."/>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-field">
+        <label>Testimonies URL</label>
+        <input type="url" id="set-testimony" placeholder="https://..."/>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-field">
+        <label>Donate URL</label>
+        <input type="url" id="set-donate" placeholder="https://..."/>
+      </div>
+    </div>
+    <button class="btn-full" onclick="saveSettings()">✓ Save Settings</button>
   </div>
+
+  <!-- PLAYER TEMPLATE -->
+  <div class="form-card">
+    <h3>🎨 Player Theme Template</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Choose a visual theme for the client player. Changes reflect immediately on save.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px" id="templateGrid">
+      <!-- filled by JS -->
+    </div>
+    <input type="hidden" id="set-template" value="default"/>
+  </div>
+
+  <!-- BACKGROUND -->
+  <div class="form-card">
+    <h3>🖼️ Player Background</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Pick a built-in background or supply a custom image URL. Changes reflect on client immediately on save.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px" id="bgGrid">
+      <!-- filled by JS -->
+    </div>
+    <input type="hidden" id="set-activebg" value="nebula"/>
+    <div class="form-row full" style="margin-top:10px">
+      <div class="form-field">
+        <label>Custom Background URL (overrides selection above)</label>
+        <input type="url" id="set-custombg" placeholder="https://example.com/background.jpg"/>
+      </div>
+    </div>
+    <button class="btn-full" onclick="saveSettings()">✓ Save All Settings</button>
+  </div>
+
+  <!-- PASSWORD -->
+  <div class="form-card">
+    <h3>🔑 Change Admin Password</h3>
+    <div class="form-row">
+      <div class="form-field">
+        <label>New Password</label>
+        <input type="password" id="new-pwd" placeholder="Enter new password"/>
+      </div>
+      <div class="form-field">
+        <label>Confirm Password</label>
+        <input type="password" id="confirm-pwd" placeholder="Repeat new password"/>
+      </div>
+    </div>
+    <button class="btn-full" onclick="changePassword()">🔒 Update Password</button>
+  </div>
+</div>
 
 </main>
 
@@ -485,6 +543,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let allTracks = [];
 let currentFilter = 'all';
 
+/* ── AUTH ── */
 async function checkAuth() {
   const token = sessionStorage.getItem('adminToken');
   if (!token) { window.location.href = 'admin-login.html'; return; }
@@ -497,27 +556,26 @@ async function checkAuth() {
 
 function doLogout() {
   const token = sessionStorage.getItem('adminToken');
-  if (token) sb.from('admin_sessions').delete().eq('token', token).then(() => {});
+  if (token) sb.from('admin_sessions').delete().eq('token', token).then(()=>{});
   sessionStorage.removeItem('adminToken');
   window.location.href = 'admin-login.html';
 }
 
+/* ── NAV ── */
 function showPage(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   el.classList.add('active');
-  if (id === 'tracks')    loadTracks();
+  if (id === 'tracks')   loadTracks();
   if (id === 'dashboard') loadDashboard();
-  if (id === 'schedule')  loadScheduleBlocks();
-  if (id === 'settings')  loadSettingsForm();
+  if (id === 'schedule') loadScheduleBlocks();
+  if (id === 'settings') loadSettingsForm();
 }
 
-// Clicking a stat card navigates to Tracks filtered by section
 function goToTracksFiltered(section) {
-  const tracksNavItem = document.querySelectorAll('.nav-item')[1]; // Tracks nav item
+  const tracksNavItem = document.querySelectorAll('.nav-item')[1];
   showPage('tracks', tracksNavItem);
-  // Wait for tracks to load then apply filter
   loadTracks().then(() => {
     currentFilter = section;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -527,7 +585,7 @@ function goToTracksFiltered(section) {
   });
 }
 
-function toast(msg, type = 'success') {
+function toast(msg, type='success') {
   const t = document.createElement('div');
   t.className = `toast ${type}`;
   t.textContent = msg;
@@ -535,28 +593,29 @@ function toast(msg, type = 'success') {
   setTimeout(() => t.remove(), 3000);
 }
 
+/* ── DASHBOARD ── */
 async function loadDashboard() {
   const { data: tracks } = await sb.from('tracks').select('section, active');
-  const music   = (tracks || []).filter(t => t.section === 'music'   && t.active).length;
-  const sermons = (tracks || []).filter(t => t.section === 'sermons' && t.active).length;
-  const kids    = (tracks || []).filter(t => t.section === 'kids'    && t.active).length;
+  const music   = (tracks||[]).filter(t => t.section==='music'   && t.active).length;
+  const sermons = (tracks||[]).filter(t => t.section==='sermons' && t.active).length;
+  const kids    = (tracks||[]).filter(t => t.section==='kids'    && t.active).length;
   document.getElementById('stat-music').textContent   = music;
   document.getElementById('stat-sermons').textContent = sermons;
   document.getElementById('stat-kids').textContent    = kids;
 
   const today = new Date().toISOString().split('T')[0];
   const { count } = await sb.from('play_events')
-    .select('*', { count: 'exact', head: true })
-    .gte('played_at', today + 'T00:00:00');
+    .select('*', { count:'exact', head:true })
+    .gte('played_at', today+'T00:00:00');
   document.getElementById('stat-plays').textContent = count || 0;
 
   const { data: plays } = await sb.from('play_events')
     .select('played_at, section, track_id, tracks!play_events_track_id_fkey(title)')
-    .order('played_at', { ascending: false })
+    .order('played_at', { ascending:false })
     .limit(20);
 
   const tbody = document.getElementById('recent-plays-body');
-  tbody.innerHTML = (plays || []).map(p => `
+  tbody.innerHTML = (plays||[]).map(p => `
     <tr>
       <td>${p.tracks?.title || 'Unknown'}</td>
       <td><span class="badge ${p.section}">${p.section}</span></td>
@@ -564,8 +623,9 @@ async function loadDashboard() {
     </tr>`).join('');
 }
 
+/* ── TRACKS ── */
 async function loadTracks() {
-  const { data } = await sb.from('tracks').select('*').order('section').order('created_at', { ascending: false });
+  const { data } = await sb.from('tracks').select('*').order('section').order('created_at', { ascending:false });
   allTracks = data || [];
   renderTracks();
 }
@@ -580,29 +640,29 @@ function filterTracks(section, btn) {
 function renderTracks() {
   const q = document.getElementById('trackSearch').value.toLowerCase();
   const filtered = allTracks.filter(t => {
-    const sectionMatch = currentFilter === 'all' || t.section === currentFilter;
-    const searchMatch  = !q || t.title.toLowerCase().includes(q) || (t.url || '').toLowerCase().includes(q);
-    return sectionMatch && searchMatch;
+    const sm = currentFilter === 'all' || t.section === currentFilter;
+    const qm = !q || t.title.toLowerCase().includes(q) || (t.url||'').toLowerCase().includes(q);
+    return sm && qm;
   });
-  document.getElementById('tracks-body').innerHTML = filtered.map((t, i) => `
+  document.getElementById('tracks-body').innerHTML = filtered.map((t,i) => `
     <tr>
-      <td style="color:var(--muted);width:40px;font-size:12px">${i + 1}</td>
+      <td style="color:var(--muted);width:40px;font-size:12px">${i+1}</td>
       <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.title}">${t.title}</td>
       <td><span class="badge ${t.section}">${t.section}</span></td>
       <td>
         <label class="toggle">
-          <input type="checkbox" ${t.active ? 'checked' : ''} onchange="toggleActive('${t.id}',this.checked)"/>
+          <input type="checkbox" ${t.active?'checked':''} onchange="toggleActive('${t.id}',this.checked)"/>
           <span class="toggle-slider"></span>
         </label>
       </td>
       <td>
-        <button class="btn-sm btn-danger" onclick="deleteTrack('${t.id}','${t.file_path || ''}')">🗑</button>
+        <button class="btn-sm btn-danger" onclick="deleteTrack('${t.id}','${t.file_path||''}')">🗑</button>
       </td>
     </tr>`).join('');
 }
 
 async function toggleActive(id, val) {
-  const { error } = await sb.from('tracks').update({ active: val }).eq('id', id);
+  const { error } = await sb.from('tracks').update({ active:val }).eq('id', id);
   if (error) toast('Error updating track', 'error');
   else toast(val ? 'Track enabled ✓' : 'Track disabled');
 }
@@ -615,10 +675,11 @@ async function deleteTrack(id, filePath) {
   else { toast('Track deleted'); await loadTracks(); }
 }
 
+/* ── UPLOAD ── */
 function switchUploadTab(id, btn) {
   document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('subtab-' + id).classList.add('active');
+  document.getElementById('subtab-'+id).classList.add('active');
   btn.classList.add('active');
 }
 
@@ -628,10 +689,10 @@ async function addByURL() {
   const url     = document.getElementById('url-input').value.trim();
   if (!title || !url) { toast('Please fill in all fields', 'error'); return; }
   if (!url.match(/\.(mp3|wav|ogg|aac|m4a)(\?.*)?$/i)) {
-    toast('URL should point to an audio file (.mp3, .wav, etc.)', 'error'); return;
+    toast('URL should point to an audio file', 'error'); return;
   }
-  const { error } = await sb.from('tracks').insert({ title, url, section, active: true });
-  if (error) toast('Error adding track: ' + error.message, 'error');
+  const { error } = await sb.from('tracks').insert({ title, url, section, active:true });
+  if (error) toast('Error adding track: '+error.message, 'error');
   else {
     toast('Track added successfully! ✓');
     document.getElementById('url-title').value = '';
@@ -656,111 +717,163 @@ function handleFileSelect(e) {
 
 async function processUploadFile(file) {
   const section = document.getElementById('file-section').value;
-  let title     = document.getElementById('file-title').value.trim();
-  if (!title) title = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
-
+  let title = document.getElementById('file-title').value.trim();
+  if (!title) title = file.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
   const bar    = document.getElementById('uploadProgressBar');
   const fill   = document.getElementById('uploadProgressFill');
   const status = document.getElementById('uploadStatus');
-  bar.classList.add('show');
-  fill.style.width = '10%';
-  status.textContent = 'Preparing file...';
-
+  bar.classList.add('show'); fill.style.width='10%'; status.textContent='Preparing...';
   try {
     let uploadBlob = file;
     const isVideo  = file.type.startsWith('video/');
-
     if (isVideo) {
       try {
-        status.textContent = 'Extracting audio from video...';
-        fill.style.width = '30%';
+        status.textContent = 'Extracting audio...'; fill.style.width='30%';
         const arrayBuf = await file.arrayBuffer();
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
         const decoded  = await audioCtx.decodeAudioData(arrayBuf);
         uploadBlob     = audioBufferToWav(decoded);
         status.textContent = 'Audio extracted. Uploading...';
-      } catch (decodeErr) {
-        throw new Error('Could not extract audio from this video. Try exporting the audio as MP3 first.');
-      }
+      } catch(e) { throw new Error('Could not extract audio. Try exporting as MP3 first.'); }
     } else {
-      status.textContent = 'Uploading audio...';
+      status.textContent = 'Uploading...';
     }
-
     fill.style.width = '60%';
     const ext      = isVideo ? 'wav' : file.name.split('.').pop().toLowerCase();
-    const fileName = `${Date.now()}_${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${ext}`;
+    const fileName = `${Date.now()}_${title.replace(/[^a-z0-9]/gi,'_').toLowerCase()}.${ext}`;
     const filePath = `${section}/${fileName}`;
-
     const { error: upErr } = await sb.storage.from('audio-files').upload(filePath, uploadBlob, {
-      contentType: isVideo ? 'audio/wav' : file.type,
-      upsert: false
+      contentType: isVideo ? 'audio/wav' : file.type, upsert:false
     });
     if (upErr) throw upErr;
-
     fill.style.width = '85%';
     const { data: pubData } = sb.storage.from('audio-files').getPublicUrl(filePath);
-    const publicUrl = pubData.publicUrl;
-
     const { error: dbErr } = await sb.from('tracks').insert({
-      title, url: publicUrl, section, active: true, file_path: filePath
+      title, url: pubData.publicUrl, section, active:true, file_path:filePath
     });
     if (dbErr) throw dbErr;
-
-    fill.style.width = '100%';
-    status.textContent = 'Upload complete! ✓';
-    toast('Track uploaded and ready! ✓');
-    setTimeout(() => { bar.classList.remove('show'); fill.style.width = '0%'; status.textContent = ''; }, 2000);
-    document.getElementById('file-title').value = '';
-    document.getElementById('fileInput').value  = '';
-
-  } catch (err) {
-    toast('Upload failed: ' + err.message, 'error');
-    bar.classList.remove('show');
-    fill.style.width = '0%';
-    status.textContent = '';
+    fill.style.width='100%'; status.textContent='Upload complete! ✓'; toast('Track uploaded! ✓');
+    setTimeout(() => { bar.classList.remove('show'); fill.style.width='0%'; status.textContent=''; }, 2000);
+    document.getElementById('file-title').value='';
+    document.getElementById('fileInput').value='';
+  } catch(err) {
+    toast('Upload failed: '+err.message, 'error');
+    bar.classList.remove('show'); fill.style.width='0%'; status.textContent='';
   }
 }
 
 function audioBufferToWav(buffer) {
-  const numCh = buffer.numberOfChannels;
-  const sr    = buffer.sampleRate;
-  const len   = buffer.length;
-  const wav   = new ArrayBuffer(44 + len * numCh * 2);
-  const view  = new DataView(wav);
-  const ws    = (o, s) => { for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
-  ws(0, 'RIFF'); view.setUint32(4, 36 + len * numCh * 2, true); ws(8, 'WAVE'); ws(12, 'fmt ');
-  view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, numCh, true);
-  view.setUint32(24, sr, true); view.setUint32(28, sr * numCh * 2, true);
-  view.setUint16(32, numCh * 2, true); view.setUint16(34, 16, true); ws(36, 'data');
-  view.setUint32(40, len * numCh * 2, true);
-  let offset = 44;
-  for (let i = 0; i < len; i++) for (let ch = 0; ch < numCh; ch++) {
-    const s = buffer.getChannelData(ch)[i];
-    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true); offset += 2;
+  const numCh=buffer.numberOfChannels,sr=buffer.sampleRate,len=buffer.length;
+  const wav=new ArrayBuffer(44+len*numCh*2);const view=new DataView(wav);
+  const ws=(o,s)=>{for(let i=0;i<s.length;i++)view.setUint8(o+i,s.charCodeAt(i))};
+  ws(0,'RIFF');view.setUint32(4,36+len*numCh*2,true);ws(8,'WAVE');ws(12,'fmt ');
+  view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,numCh,true);
+  view.setUint32(24,sr,true);view.setUint32(28,sr*numCh*2,true);
+  view.setUint16(32,numCh*2,true);view.setUint16(34,16,true);ws(36,'data');
+  view.setUint32(40,len*numCh*2,true);
+  let offset=44;
+  for(let i=0;i<len;i++)for(let ch=0;ch<numCh;ch++){
+    const s=buffer.getChannelData(ch)[i];
+    view.setInt16(offset,s<0?s*0x8000:s*0x7FFF,true);offset+=2;
   }
-  return new Blob([wav], { type: 'audio/wav' });
+  return new Blob([wav],{type:'audio/wav'});
+}
+
+/* ── SCHEDULE ── */
+const SCHEDULE_TEMPLATES = {
+  workhours: { section:'music',   days:['mon','tue','wed','thu','fri'], start:8,  end:18 },
+  morning:   { section:'sermons', days:['mon','tue','wed','thu','fri','sat','sun'], start:5, end:9 },
+  evening:   { section:'sermons', days:['mon','tue','wed','thu','fri','sat','sun'], start:18, end:22 },
+  kids:      { section:'kids',    days:['sat','sun'], start:9, end:12 },
+  allday:    { section:'music',   days:['mon','tue','wed','thu','fri','sat','sun'], start:0, end:24 },
+};
+
+function applyTemplate(key) {
+  const t = SCHEDULE_TEMPLATES[key];
+  if (!t) return;
+  document.getElementById('sched-section').value = t.section;
+  document.getElementById('sched-start').value   = t.start;
+  document.getElementById('sched-end').value     = t.end;
+  const daysSel = document.getElementById('sched-days');
+  Array.from(daysSel.options).forEach(o => { o.selected = t.days.includes(o.value); });
+  toast('Template applied — review and click Save Block');
 }
 
 async function loadScheduleBlocks() {
   const { data } = await sb.from('schedule_blocks').select('*').order('start_hour');
   const container = document.getElementById('schedule-blocks-list');
-  container.innerHTML = (data || []).map(b => `
+  container.innerHTML = (data||[]).map(b => `
     <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;
-      padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;
-      justify-content:space-between;gap:12px">
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <span class="badge ${b.section}">${b.section}</span>
-        <span style="font-size:13px;font-weight:600">${b.start_hour}:00 – ${b.end_hour}:00</span>
-        <span style="font-size:11px;color:var(--muted)">${b.days.join(', ')}</span>
+      padding:14px 18px;margin-bottom:10px" id="sblock-${b.id}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="badge ${b.section}">${b.section}</span>
+          <span style="font-size:13px;font-weight:600">${b.start_hour}:00 – ${b.end_hour}:00</span>
+          <span style="font-size:11px;color:var(--muted)">${b.days.join(', ')}</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-sm btn-secondary" onclick="startEditBlock('${b.id}','${b.section}',${b.start_hour},${b.end_hour},'${b.days.join(',')}')">✏️ Edit</button>
+          <label class="toggle">
+            <input type="checkbox" ${b.active?'checked':''} onchange="toggleScheduleBlock('${b.id}',this.checked)"/>
+            <span class="toggle-slider"></span>
+          </label>
+          <button class="btn-sm btn-danger" onclick="deleteScheduleBlock('${b.id}')">🗑</button>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <label class="toggle">
-          <input type="checkbox" ${b.active ? 'checked' : ''} onchange="toggleScheduleBlock('${b.id}',this.checked)"/>
-          <span class="toggle-slider"></span>
-        </label>
-        <button class="btn-sm btn-danger" onclick="deleteScheduleBlock('${b.id}')">🗑</button>
+      <!-- inline edit form (hidden by default) -->
+      <div id="edit-form-${b.id}" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="form-field">
+            <label>Section</label>
+            <select id="edit-section-${b.id}">
+              <option value="music" ${b.section==='music'?'selected':''}>Music</option>
+              <option value="sermons" ${b.section==='sermons'?'selected':''}>Sermons</option>
+              <option value="kids" ${b.section==='kids'?'selected':''}>Kids</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Days (Ctrl+click multi)</label>
+            <select id="edit-days-${b.id}" multiple style="height:90px">
+              ${['mon','tue','wed','thu','fri','sat','sun'].map(d=>`<option value="${d}" ${b.days.includes(d)?'selected':''}>${d}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="form-field">
+            <label>Start Hour</label>
+            <input type="number" id="edit-start-${b.id}" min="0" max="23" value="${b.start_hour}"/>
+          </div>
+          <div class="form-field">
+            <label>End Hour</label>
+            <input type="number" id="edit-end-${b.id}" min="1" max="24" value="${b.end_hour}"/>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm btn-primary" onclick="saveEditBlock('${b.id}')">✓ Save Changes</button>
+          <button class="btn-sm btn-secondary" onclick="cancelEditBlock('${b.id}')">✕ Cancel</button>
+        </div>
       </div>
     </div>`).join('') || '<p style="color:var(--muted);font-size:13px;padding:8px 0">No schedule blocks yet.</p>';
+}
+
+function startEditBlock(id) {
+  document.getElementById('edit-form-'+id).style.display = 'block';
+}
+function cancelEditBlock(id) {
+  document.getElementById('edit-form-'+id).style.display = 'none';
+}
+
+async function saveEditBlock(id) {
+  const section    = document.getElementById('edit-section-'+id).value;
+  const start_hour = parseInt(document.getElementById('edit-start-'+id).value);
+  const end_hour   = parseInt(document.getElementById('edit-end-'+id).value);
+  const daysSel    = document.getElementById('edit-days-'+id);
+  const days       = Array.from(daysSel.selectedOptions).map(o => o.value);
+  if (end_hour <= start_hour) { toast('End must be greater than start', 'error'); return; }
+  if (!days.length) { toast('Select at least one day', 'error'); return; }
+  const { error } = await sb.from('schedule_blocks').update({ section, start_hour, end_hour, days }).eq('id', id);
+  if (error) toast('Error saving: '+error.message, 'error');
+  else { toast('Block updated ✓'); await loadScheduleBlocks(); }
 }
 
 async function saveScheduleBlock() {
@@ -769,17 +882,15 @@ async function saveScheduleBlock() {
   const end_hour   = parseInt(document.getElementById('sched-end').value);
   const daysSel    = document.getElementById('sched-days');
   const days       = Array.from(daysSel.selectedOptions).map(o => o.value);
-
   if (end_hour <= start_hour) { toast('End hour must be greater than start hour', 'error'); return; }
   if (!days.length) { toast('Select at least one day', 'error'); return; }
-
-  const { error } = await sb.from('schedule_blocks').insert({ section, start_hour, end_hour, days, active: true });
-  if (error) toast('Error saving block: ' + error.message, 'error');
+  const { error } = await sb.from('schedule_blocks').insert({ section, start_hour, end_hour, days, active:true });
+  if (error) toast('Error saving block: '+error.message, 'error');
   else { toast('Schedule block saved! ✓'); await loadScheduleBlocks(); }
 }
 
 async function toggleScheduleBlock(id, val) {
-  await sb.from('schedule_blocks').update({ active: val }).eq('id', id);
+  await sb.from('schedule_blocks').update({ active:val }).eq('id', id);
   toast(val ? 'Block enabled ✓' : 'Block disabled');
 }
 
@@ -790,19 +901,78 @@ async function deleteScheduleBlock(id) {
   await loadScheduleBlocks();
 }
 
+/* ── SETTINGS ── */
+const TEMPLATES_DEF = {
+  default:  { name:'Default',      emoji:'🌌' },
+  midnight: { name:'Midnight Blue', emoji:'🌃' },
+  rose:     { name:'Rose Garden',   emoji:'🌹' },
+  forest:   { name:'Forest Green',  emoji:'🌿' },
+  gold:     { name:'Sacred Gold',   emoji:'✨' },
+};
+
+const BUILTIN_BGS = {
+  nebula:    { label:'Nebula',    emoji:'🔭' },
+  aurora:    { label:'Aurora',    emoji:'🌌' },
+  forest:    { label:'Forest',    emoji:'🌲' },
+  ocean:     { label:'Ocean',     emoji:'🌊' },
+  mountains: { label:'Mountains', emoji:'⛰️' },
+};
+
+function renderTemplateGrid(activeKey) {
+  const grid = document.getElementById('templateGrid');
+  grid.innerHTML = Object.entries(TEMPLATES_DEF).map(([key, t]) => `
+    <button onclick="selectTemplate('${key}')" id="tpl-${key}"
+      style="padding:12px 10px;border-radius:10px;border:2px solid ${activeKey===key?'var(--accent)':'rgba(255,255,255,.12)'};
+      background:${activeKey===key?'rgba(192,132,252,.15)':'rgba(255,255,255,.04)'};
+      color:${activeKey===key?'var(--accent)':'var(--muted)'};cursor:pointer;
+      font-size:12px;font-weight:700;font-family:inherit;transition:all 180ms;text-align:center;line-height:1.6">
+      ${t.emoji}<br>${t.name}
+    </button>`).join('');
+}
+
+function selectTemplate(key) {
+  document.getElementById('set-template').value = key;
+  renderTemplateGrid(key);
+}
+
+function renderBgGrid(activeKey) {
+  const grid = document.getElementById('bgGrid');
+  grid.innerHTML = Object.entries(BUILTIN_BGS).map(([key, b]) => `
+    <button onclick="selectBg('${key}')" id="bg-${key}"
+      style="padding:12px 10px;border-radius:10px;border:2px solid ${activeKey===key?'var(--accent)':'rgba(255,255,255,.12)'};
+      background:${activeKey===key?'rgba(192,132,252,.15)':'rgba(255,255,255,.04)'};
+      color:${activeKey===key?'var(--accent)':'var(--muted)'};cursor:pointer;
+      font-size:12px;font-weight:700;font-family:inherit;transition:all 180ms;text-align:center;line-height:1.6">
+      ${b.emoji}<br>${b.label}
+    </button>`).join('');
+}
+
+function selectBg(key) {
+  document.getElementById('set-activebg').value = key;
+  renderBgGrid(key);
+}
+
 async function loadSettingsForm() {
   const { data } = await sb.from('settings').select('key,value');
   const s = {};
-  (data || []).forEach(r => s[r.key] = r.value);
+  (data||[]).forEach(r => s[r.key] = r.value);
   document.getElementById('set-title').value     = s.site_title || '';
   document.getElementById('set-wa').value        = s.whatsapp_number || '';
   document.getElementById('set-logo').value      = s.logo_url || '';
   document.getElementById('set-prayer').value    = s.prayer_url || '';
   document.getElementById('set-testimony').value = s.testimony_url || '';
   document.getElementById('set-donate').value    = s.donate_url || '';
-  if (s.logo_url) previewLogo(s.logo_url);
+  document.getElementById('set-custombg').value  = s.custom_bg_url || '';
 
-  // Update sidebar logo if set
+  const activeTemplate = s.active_template || 'default';
+  const activeBg       = s.active_bg || 'nebula';
+  document.getElementById('set-template').value  = activeTemplate;
+  document.getElementById('set-activebg').value  = activeBg;
+
+  renderTemplateGrid(activeTemplate);
+  renderBgGrid(activeBg);
+
+  if (s.logo_url) previewLogo(s.logo_url);
   if (s.logo_url) {
     const mark = document.getElementById('sidebarLogoMark');
     mark.innerHTML = `<img src="${s.logo_url}" alt="Logo"/>`;
@@ -812,36 +982,29 @@ async function loadSettingsForm() {
 function previewLogo(url) {
   const preview = document.getElementById('logoPreview');
   const img     = document.getElementById('logoPreviewImg');
-  if (url) {
-    img.src = url;
-    preview.style.display = 'flex';
-  } else {
-    preview.style.display = 'none';
-  }
+  if (url) { img.src=url; preview.style.display='flex'; }
+  else { preview.style.display='none'; }
 }
 
 async function saveSettings() {
   const rows = [
-    { key: 'site_title',      value: document.getElementById('set-title').value },
-    { key: 'whatsapp_number', value: document.getElementById('set-wa').value },
-    { key: 'logo_url',        value: document.getElementById('set-logo').value },
-    { key: 'prayer_url',      value: document.getElementById('set-prayer').value },
-    { key: 'testimony_url',   value: document.getElementById('set-testimony').value },
-    { key: 'donate_url',      value: document.getElementById('set-donate').value },
+    { key:'site_title',      value:document.getElementById('set-title').value },
+    { key:'whatsapp_number', value:document.getElementById('set-wa').value },
+    { key:'logo_url',        value:document.getElementById('set-logo').value },
+    { key:'prayer_url',      value:document.getElementById('set-prayer').value },
+    { key:'testimony_url',   value:document.getElementById('set-testimony').value },
+    { key:'donate_url',      value:document.getElementById('set-donate').value },
+    { key:'active_template', value:document.getElementById('set-template').value },
+    { key:'active_bg',       value:document.getElementById('set-activebg').value },
+    { key:'custom_bg_url',   value:document.getElementById('set-custombg').value },
   ];
   for (const row of rows) {
-    await sb.from('settings').upsert(row, { onConflict: 'key' });
+    await sb.from('settings').upsert(row, { onConflict:'key' });
   }
-  toast('Settings saved! ✓');
-
-  // Refresh sidebar logo immediately after saving
+  toast('Settings saved! Client will reflect changes immediately ✓');
   const logoUrl = document.getElementById('set-logo').value;
   const mark = document.getElementById('sidebarLogoMark');
-  if (logoUrl) {
-    mark.innerHTML = `<img src="${logoUrl}" alt="Logo"/>`;
-  } else {
-    mark.innerHTML = '🎙️';
-  }
+  mark.innerHTML = logoUrl ? `<img src="${logoUrl}" alt="Logo"/>` : '🎙️';
 }
 
 async function changePassword() {
@@ -851,15 +1014,15 @@ async function changePassword() {
   if (newPwd !== confPwd) { toast('Passwords do not match', 'error'); return; }
   if (newPwd.length < 8) { toast('Password must be at least 8 characters', 'error'); return; }
   const hash = await sha256(newPwd);
-  await sb.from('settings').upsert({ key: 'admin_password_hash', value: hash }, { onConflict: 'key' });
+  await sb.from('settings').upsert({ key:'admin_password_hash', value:hash }, { onConflict:'key' });
   toast('Password updated! ✓');
-  document.getElementById('new-pwd').value     = '';
-  document.getElementById('confirm-pwd').value = '';
+  document.getElementById('new-pwd').value='';
+  document.getElementById('confirm-pwd').value='';
 }
 
 async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
 checkAuth().then(() => loadDashboard());
