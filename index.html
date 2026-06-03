@@ -121,10 +121,10 @@ body{
   display:none;
 }
 .cover-art-fallback{
-  width:54px;height:54px;border-radius:12px;flex-shrink:0;
+  width:44px;height:44px;border-radius:10px;flex-shrink:0;
   background:linear-gradient(135deg,rgba(147,51,234,.5),rgba(236,72,153,.4));
   display:flex;align-items:center;justify-content:center;
-  font-size:22px;border:1px solid rgba(255,255,255,.1);
+  font-size:16px;border:1px solid rgba(255,255,255,.1);
 }
 .now-playing-info{flex:1;overflow:hidden}
 .np-label{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
@@ -344,11 +344,48 @@ body{
 }
 .corner-modal-body{flex:1;overflow:auto}
 .corner-modal-body iframe{width:100%;height:380px;border:none}
-
+/* ── TOP MENU BAR ── */
+.top-menu-bar{
+  display:flex;align-items:center;gap:4px;
+}
+.top-menu-item{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.75);
+  border-radius:6px;
+  padding:5px 9px;
+  font-size:10px;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;
+  letter-spacing:.2px;
+  transition:all 160ms;white-space:nowrap;
+}
+.top-menu-item:hover{
+  background:rgba(255,255,255,.14);
+  color:#fff;
+  border-color:rgba(255,255,255,.25);
+}
+.admin-login-btn{
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:7px;
+  color:rgba(255,255,255,.4);
+  font-size:13px;text-decoration:none;
+  transition:all 160ms;flex-shrink:0;
+}
+.admin-login-btn:hover{
+  background:rgba(192,132,252,.15);
+  border-color:rgba(192,132,252,.35);
+  color:rgba(192,132,252,.9);
+}
 .app-footer{
-  text-align:center;font-size:10px;color:rgba(255,255,255,.2);
+  text-align:center;font-size:11px;
+  color:rgba(255,255,255,.75);
   padding:8px 18px 14px;
-  font-weight:400;
+  font-weight:600;
+  letter-spacing:.3px;
+  text-shadow:0 1px 6px rgba(0,0,0,.6);
 }
 </style>
 </head>
@@ -369,13 +406,15 @@ body{
         <div class="subtitle">Come listen, unending blessings</div>
       </div>
     </div>
-    <div class="header-right" style="position:relative">
-      <button class="corner-menu-btn" id="cornerMenuBtn" onclick="toggleCornerMenu()">✦ More</button>
-      <div class="corner-dropdown" id="cornerDropdown">
-        <div class="corner-dd-item" onclick="openCorner('prayer')">🙏 Prayer Requests</div>
-        <div class="corner-dd-item" onclick="openCorner('testimony')">✨ Testimonies</div>
-        <div class="corner-dd-item" onclick="openCorner('donate')">❤️ Donate</div>
+<div class="header-right" style="position:relative;display:flex;align-items:center;gap:6px">
+      <!-- Horizontal semi-menu -->
+      <div class="top-menu-bar" id="topMenuBar">
+        <button class="top-menu-item" onclick="openCorner('prayer')">🙏 Prayer</button>
+        <button class="top-menu-item" onclick="openCorner('testimony')">✨ Testimony</button>
+        <button class="top-menu-item" onclick="openCorner('donate')">❤️ Donate</button>
       </div>
+      <!-- Admin login button -->
+      <a href="admin-login.html" class="admin-login-btn" title="Admin Login">⚙</a>
     </div>
   </div>
 
@@ -559,8 +598,21 @@ async function loadSettings() {
       document.getElementById('headerLogoFallback').style.display = 'none';
     }
 
-    // Apply template theme
-    applyTemplate(settings.active_template || 'default');
+// Apply template theme — use theme_json if available (supports admin-edited themes)
+    if (settings.theme_json) {
+      try {
+        const t = JSON.parse(settings.theme_json);
+        const r = document.documentElement;
+        r.style.setProperty('--accent',   t.accent   || '#ffd89b');
+        r.style.setProperty('--accent-2', t.accent2  || '#ff6b95');
+        r.style.setProperty('--accent-3', t.accent3  || '#9796f0');
+        document.getElementById('appShell').style.background    = t.cardBg       || 'rgba(12,3,30,.72)';
+        document.getElementById('appShell').style.borderRadius  = t.borderRadius || '20px';
+        document.querySelector('.header').style.background      = t.headerBg     || 'rgba(255,255,255,.03)';
+      } catch(e) { applyTemplate(settings.active_template || 'default'); }
+    } else {
+      applyTemplate(settings.active_template || 'default');
+    }
 
     // Apply background
     applyBackground(settings.active_bg || 'nebula', settings.custom_bg_url || '');
@@ -635,25 +687,56 @@ function applyTemplate(key) {
 }
 
 /* ── BACKGROUND SYSTEM ── */
+const ALL_BACKGROUNDS = {
+  nebula:    { url:'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1600&q=90', overlay:'rgba(20,3,55,.6),rgba(50,8,90,.55),rgba(15,3,45,.62)' },
+  aurora:    { url:'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&q=90', overlay:'rgba(0,10,30,.58),rgba(0,22,50,.52),rgba(0,8,25,.60)' },
+  forest:    { url:'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=90', overlay:'rgba(3,15,3,.55),rgba(8,28,8,.50),rgba(2,12,2,.58)' },
+  ocean:     { url:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=90', overlay:'rgba(0,12,38,.55),rgba(0,20,55,.50),rgba(0,8,28,.58)' },
+  mountains: { url:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=90', overlay:'rgba(8,8,20,.55),rgba(15,12,32,.50),rgba(5,5,15,.58)' },
+  sunset:    { url:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1600&q=90', overlay:'rgba(40,10,5,.52),rgba(60,20,5,.48),rgba(30,8,3,.55)' },
+  milkyway:  { url:'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1600&q=90', overlay:'rgba(5,5,25,.55),rgba(10,5,40,.50),rgba(3,3,18,.58)' },
+  tropical:  { url:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=90', overlay:'rgba(3,18,10,.52),rgba(5,30,15,.48),rgba(2,14,8,.55)' },
+  waterfall: { url:'https://images.unsplash.com/photo-1546768292-fb12f6c92568?w=1600&q=90', overlay:'rgba(2,12,22,.52),rgba(3,18,35,.48),rgba(1,8,16,.55)' },
+  desert:    { url:'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1600&q=90', overlay:'rgba(30,15,3,.52),rgba(45,22,5,.48),rgba(22,10,2,.55)' },
+};
+
 function applyBackground(key, customUrl) {
   const bgLayer   = document.getElementById('bgLayer');
   const bgOverlay = document.getElementById('bgOverlay');
-  let url = customUrl || '';
-  let overlay = 'rgba(30,5,70,.75),rgba(60,10,100,.65),rgba(20,5,55,.72)';
+  let url     = customUrl || '';
+  let overlay = 'rgba(20,3,55,.6),rgba(50,8,90,.55),rgba(15,3,45,.62)';
 
-  if (!url && BUILTIN_BACKGROUNDS[key]) {
-    url = BUILTIN_BACKGROUNDS[key].url;
-    overlay = BUILTIN_BACKGROUNDS[key].overlay;
+  if (!url && ALL_BACKGROUNDS[key]) {
+    url     = ALL_BACKGROUNDS[key].url;
+    overlay = ALL_BACKGROUNDS[key].overlay;
   }
 
   if (url) {
     bgLayer.style.backgroundImage = `url('${url}')`;
+    bgLayer.style.backgroundSize = 'cover';
   } else {
     bgLayer.style.backgroundImage = 'none';
     bgLayer.style.background = '#1a0535';
   }
-
   bgOverlay.style.background = `linear-gradient(135deg,${overlay})`;
+
+  // Masalio Media watermark
+  let wm = document.getElementById('bgWatermark');
+  if (!wm) {
+    wm = document.createElement('div');
+    wm.id = 'bgWatermark';
+    wm.style.cssText = `
+      position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+      z-index:2;pointer-events:none;
+      font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;
+      letter-spacing:2.5px;text-transform:uppercase;
+      color:rgba(255,255,255,.22);
+      text-shadow:0 1px 6px rgba(0,0,0,.5);
+      white-space:nowrap;
+    `;
+    document.body.appendChild(wm);
+  }
+  wm.textContent = '✦ MASALIO MEDIA ✦';
 }
 
 /* ── TRACKS ── */
@@ -895,22 +978,13 @@ function relTime(d) {
 }
 
 /* ── CORNER MENU ── */
-const settings_c = {};
 const cornerCfg = {
   prayer:    { label:'Prayer Requests', key:'prayer_url' },
   testimony: { label:'Testimonies',     key:'testimony_url' },
   donate:    { label:'Donate',          key:'donate_url' },
 };
 
-function toggleCornerMenu() {
-  document.getElementById('cornerDropdown').classList.toggle('open');
-}
-document.addEventListener('click', e => {
-  const btn = document.getElementById('cornerMenuBtn');
-  const dd  = document.getElementById('cornerDropdown');
-  if (!btn.contains(e.target) && !dd.contains(e.target)) dd.classList.remove('open');
-  unblock();
-});
+document.addEventListener('click', () => unblock());
 
 function openCorner(type) {
   const cfg = cornerCfg[type];
@@ -918,7 +992,6 @@ function openCorner(type) {
   document.getElementById('cornerModalTitle').textContent = cfg.label;
   document.getElementById('cornerModalBody').innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`;
   document.getElementById('cornerModal').classList.add('active');
-  document.getElementById('cornerDropdown').classList.remove('open');
 }
 function closeCorner() {
   document.getElementById('cornerModal').classList.remove('active');
@@ -988,6 +1061,56 @@ function switchSection(section, btn) {
 }
 
 init();
+subscribeToRealtimeUpdates();
+
+function subscribeToRealtimeUpdates() {
+  sb.channel('realtime:settings')
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'settings'
+    }, payload => {
+      const row = payload.new;
+      if (!row || !row.key) return;
+
+      if (row.key === 'theme_json') {
+        try {
+          const t = JSON.parse(row.value);
+          const r = document.documentElement;
+          r.style.setProperty('--accent',   t.accent   || '#ffd89b');
+          r.style.setProperty('--accent-2', t.accent2  || '#ff6b95');
+          r.style.setProperty('--accent-3', t.accent3  || '#9796f0');
+          const shell = document.getElementById('appShell');
+          if (shell) {
+            shell.style.background   = t.cardBg       || 'rgba(12,3,30,.72)';
+            shell.style.borderRadius = t.borderRadius || '20px';
+          }
+        } catch(e) {}
+      }
+
+      if (row.key === 'active_bg' || row.key === 'custom_bg_url') {
+        sb.from('settings').select('key,value')
+          .in('key', ['active_bg', 'custom_bg_url'])
+          .then(({ data }) => {
+            const s = {};
+            (data || []).forEach(r => s[r.key] = r.value);
+            applyBackground(s.active_bg || 'nebula', s.custom_bg_url || '');
+          });
+      }
+
+      if (row.key === 'active_template' && !settings.theme_json) {
+        applyTemplate(row.value || 'default');
+      }
+    })
+    .subscribe();
+
+  sb.channel('realtime:tracks')
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'tracks'
+    }, async () => {
+      await loadTracks();
+      if (audio.paused) loadTrack(dequeueNext(currentSection));
+    })
+    .subscribe();
+}
 </script>
 </body>
 </html>

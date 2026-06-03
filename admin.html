@@ -301,14 +301,11 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
 
     <div class="sub-tab active" id="subtab-url">
       <div class="form-card">
-        <h3>🔗 Add Track by .mp3 URL</h3>
+        <h3>🔗 Add Tracks by URL</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Add one or many tracks at once. Each row = one track. Click <strong style="color:var(--accent)">+ Add Row</strong> to add more.</p>
         <div class="form-row">
           <div class="form-field">
-            <label>Track Title</label>
-            <input type="text" id="url-title" placeholder="Enter track title"/>
-          </div>
-          <div class="form-field">
-            <label>Section</label>
+            <label>Default Section (applies to all rows unless overridden)</label>
             <select id="url-section">
               <option value="music">Music</option>
               <option value="sermons">Sermons</option>
@@ -316,16 +313,16 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
             </select>
           </div>
         </div>
-        <div class="form-row full">
-          <div class="form-field">
-            <label>Audio URL (.mp3)</label>
-            <input type="url" id="url-input" placeholder="https://example.com/song.mp3"/>
-          </div>
+        <div id="url-rows-container">
+          <!-- rows injected by JS -->
         </div>
-        <button class="btn-full" onclick="addByURL()">✓ Validate & Add Track</button>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <button class="btn-sm btn-secondary" style="padding:9px 18px;font-size:12px" onclick="addURLRow()">+ Add Row</button>
+          <button class="btn-full" style="margin-top:0" onclick="addByURLBatch()">✓ Add All Tracks</button>
+        </div>
+        <div id="url-batch-status" style="margin-top:12px;font-size:12px;color:var(--accent)"></div>
       </div>
     </div>
-
     <div class="sub-tab" id="subtab-file">
       <div class="form-card">
         <h3>💾 Upload Audio or Video File</h3>
@@ -348,14 +345,15 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
         </div>
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
           <div class="upload-zone-icon">🎶</div>
-          <p><strong>Click to choose file</strong> or drag and drop here</p>
-          <p style="font-size:11px;margin-top:6px;color:rgba(255,255,255,.3)">Max 50MB per file</p>
+          <p><strong>Click to choose files</strong> or drag and drop here</p>
+          <p style="font-size:11px;margin-top:6px;color:rgba(255,255,255,.3)">Multiple files allowed · Max 50MB per file · Audio & Video supported</p>
           <div class="progress-bar" id="uploadProgressBar">
             <div class="progress-bar-fill" id="uploadProgressFill"></div>
           </div>
           <p id="uploadStatus" style="font-size:12px;margin-top:10px;color:var(--accent)"></p>
         </div>
-        <input type="file" id="fileInput" style="display:none" accept="audio/*,video/*" onchange="handleFileSelect(event)"/>
+        <input type="file" id="fileInput" style="display:none" accept="audio/*,video/*" multiple onchange="handleFileSelect(event)"/>
+        <div id="file-queue" style="margin-top:14px;display:flex;flex-direction:column;gap:8px"></div>
       </div>
     </div>
   </div>
@@ -490,20 +488,71 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
     <button class="btn-full" onclick="saveSettings()">✓ Save Settings</button>
   </div>
 
-  <!-- PLAYER TEMPLATE -->
+<!-- PLAYER TEMPLATE -->
   <div class="form-card">
-    <h3>🎨 Player Theme Template</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Choose a visual theme for the client player. Changes reflect immediately on save.</p>
+    <h3>🎨 Player Theme Templates</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Click a theme to select it. Click <strong style="color:var(--accent)">✏️ Edit</strong> on any theme to customise its colours.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px" id="templateGrid">
       <!-- filled by JS -->
     </div>
     <input type="hidden" id="set-template" value="default"/>
+
+    <!-- INLINE THEME EDITOR -->
+    <div id="theme-editor" style="display:none;margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,.08)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <h4 style="font-size:13px;font-weight:800;color:var(--accent2)">✏️ Editing: <span id="te-name-display"></span></h4>
+        <button class="btn-sm btn-secondary" onclick="closeThemeEditor()">✕ Close</button>
+      </div>
+      <input type="hidden" id="te-key"/>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px">
+        <div class="form-field">
+          <label>Theme Name</label>
+          <input type="text" id="te-name" placeholder="e.g. Midnight Blue"/>
+        </div>
+        <div class="form-field">
+          <label>Emoji Icon</label>
+          <input type="text" id="te-emoji" placeholder="🌌" style="width:80px"/>
+        </div>
+        <div class="form-field">
+          <label>Accent Colour 1</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="te-accent" style="width:40px;height:36px;padding:2px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.2);background:transparent"/>
+            <input type="text" id="te-accent-hex" placeholder="#ffd89b" style="flex:1" oninput="syncColor('te-accent','te-accent-hex')"/>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Accent Colour 2</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="te-accent2" style="width:40px;height:36px;padding:2px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.2);background:transparent"/>
+            <input type="text" id="te-accent2-hex" placeholder="#ff6b95" style="flex:1" oninput="syncColor('te-accent2','te-accent2-hex')"/>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Accent Colour 3</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="te-accent3" style="width:40px;height:36px;padding:2px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.2);background:transparent"/>
+            <input type="text" id="te-accent3-hex" placeholder="#9796f0" style="flex:1" oninput="syncColor('te-accent3','te-accent3-hex')"/>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Card Background (rgba)</label>
+          <input type="text" id="te-cardbg" placeholder="rgba(12,3,30,.72)"/>
+        </div>
+        <div class="form-field">
+          <label>Border Radius</label>
+          <input type="text" id="te-radius" placeholder="20px"/>
+        </div>
+      </div>
+      <!-- LIVE PREVIEW SWATCH -->
+      <div id="te-preview-swatch" style="height:36px;border-radius:10px;margin-bottom:14px;transition:all 300ms;border:1px solid rgba(255,255,255,.15)"></div>
+      <button class="btn-full" style="margin-top:0" onclick="saveThemeEdit()">✓ Save Theme Changes</button>
+    </div>
   </div>
 
-  <!-- BACKGROUND -->
+<!-- BACKGROUND -->
   <div class="form-card">
     <h3>🖼️ Player Background</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Pick a built-in background or supply a custom image URL. Changes reflect on client immediately on save.</p>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Pick a built-in background or supply a custom image URL. Each background includes the <strong style="color:var(--accent)">Masalio Media</strong> watermark in a matching style.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px" id="bgGrid">
       <!-- filled by JS -->
     </div>
@@ -553,7 +602,6 @@ async function checkAuth() {
     window.location.href = 'admin-login.html';
   }
 }
-
 function doLogout() {
   const token = sessionStorage.getItem('adminToken');
   if (token) sb.from('admin_sessions').delete().eq('token', token).then(()=>{});
@@ -567,12 +615,12 @@ function showPage(id, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   el.classList.add('active');
-  if (id === 'tracks')   loadTracks();
+  if (id === 'tracks')    loadTracks();
   if (id === 'dashboard') loadDashboard();
-  if (id === 'schedule') loadScheduleBlocks();
-  if (id === 'settings') loadSettingsForm();
+  if (id === 'schedule')  loadScheduleBlocks();
+  if (id === 'settings')  loadSettingsForm();
+  if (id === 'upload')    initURLRows();
 }
-
 function goToTracksFiltered(section) {
   const tracksNavItem = document.querySelectorAll('.nav-item')[1];
   showPage('tracks', tracksNavItem);
@@ -584,7 +632,6 @@ function goToTracksFiltered(section) {
     renderTracks();
   });
 }
-
 function toast(msg, type='success') {
   const t = document.createElement('div');
   t.className = `toast ${type}`;
@@ -602,22 +649,15 @@ async function loadDashboard() {
   document.getElementById('stat-music').textContent   = music;
   document.getElementById('stat-sermons').textContent = sermons;
   document.getElementById('stat-kids').textContent    = kids;
-
   const today = new Date().toISOString().split('T')[0];
-  const { count } = await sb.from('play_events')
-    .select('*', { count:'exact', head:true })
-    .gte('played_at', today+'T00:00:00');
+  const { count } = await sb.from('play_events').select('*',{count:'exact',head:true}).gte('played_at',today+'T00:00:00');
   document.getElementById('stat-plays').textContent = count || 0;
-
   const { data: plays } = await sb.from('play_events')
     .select('played_at, section, track_id, tracks!play_events_track_id_fkey(title)')
-    .order('played_at', { ascending:false })
-    .limit(20);
-
-  const tbody = document.getElementById('recent-plays-body');
-  tbody.innerHTML = (plays||[]).map(p => `
+    .order('played_at',{ascending:false}).limit(20);
+  document.getElementById('recent-plays-body').innerHTML = (plays||[]).map(p=>`
     <tr>
-      <td>${p.tracks?.title || 'Unknown'}</td>
+      <td>${p.tracks?.title||'Unknown'}</td>
       <td><span class="badge ${p.section}">${p.section}</span></td>
       <td style="color:var(--muted);font-size:11px">${new Date(p.played_at).toLocaleString()}</td>
     </tr>`).join('');
@@ -625,141 +665,200 @@ async function loadDashboard() {
 
 /* ── TRACKS ── */
 async function loadTracks() {
-  const { data } = await sb.from('tracks').select('*').order('section').order('created_at', { ascending:false });
+  const { data } = await sb.from('tracks').select('*').order('section').order('created_at',{ascending:false});
   allTracks = data || [];
   renderTracks();
 }
-
 function filterTracks(section, btn) {
   currentFilter = section;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderTracks();
 }
-
 function renderTracks() {
   const q = document.getElementById('trackSearch').value.toLowerCase();
   const filtered = allTracks.filter(t => {
-    const sm = currentFilter === 'all' || t.section === currentFilter;
+    const sm = currentFilter==='all' || t.section===currentFilter;
     const qm = !q || t.title.toLowerCase().includes(q) || (t.url||'').toLowerCase().includes(q);
     return sm && qm;
   });
-  document.getElementById('tracks-body').innerHTML = filtered.map((t,i) => `
+  document.getElementById('tracks-body').innerHTML = filtered.map((t,i)=>`
     <tr>
       <td style="color:var(--muted);width:40px;font-size:12px">${i+1}</td>
       <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.title}">${t.title}</td>
       <td><span class="badge ${t.section}">${t.section}</span></td>
-      <td>
-        <label class="toggle">
-          <input type="checkbox" ${t.active?'checked':''} onchange="toggleActive('${t.id}',this.checked)"/>
-          <span class="toggle-slider"></span>
-        </label>
-      </td>
-      <td>
-        <button class="btn-sm btn-danger" onclick="deleteTrack('${t.id}','${t.file_path||''}')">🗑</button>
-      </td>
+      <td><label class="toggle"><input type="checkbox" ${t.active?'checked':''} onchange="toggleActive('${t.id}',this.checked)"/><span class="toggle-slider"></span></label></td>
+      <td><button class="btn-sm btn-danger" onclick="deleteTrack('${t.id}','${t.file_path||''}')">🗑</button></td>
     </tr>`).join('');
 }
-
 async function toggleActive(id, val) {
-  const { error } = await sb.from('tracks').update({ active:val }).eq('id', id);
-  if (error) toast('Error updating track', 'error');
-  else toast(val ? 'Track enabled ✓' : 'Track disabled');
+  const { error } = await sb.from('tracks').update({active:val}).eq('id',id);
+  if (error) toast('Error updating track','error');
+  else toast(val?'Track enabled ✓':'Track disabled');
 }
-
 async function deleteTrack(id, filePath) {
   if (!confirm('Delete this track? This cannot be undone.')) return;
   if (filePath) await sb.storage.from('audio-files').remove([filePath]);
-  const { error } = await sb.from('tracks').delete().eq('id', id);
-  if (error) toast('Delete failed', 'error');
+  const { error } = await sb.from('tracks').delete().eq('id',id);
+  if (error) toast('Delete failed','error');
   else { toast('Track deleted'); await loadTracks(); }
 }
 
-/* ── UPLOAD ── */
+/* ── UPLOAD — URL (Multi-row) ── */
+let urlRowCount = 0;
+function initURLRows() {
+  const container = document.getElementById('url-rows-container');
+  if (!container) return;
+  if (container.children.length === 0) { addURLRow(); addURLRow(); }
+}
+function addURLRow() {
+  urlRowCount++;
+  const id = urlRowCount;
+  const container = document.getElementById('url-rows-container');
+  const row = document.createElement('div');
+  row.id = `url-row-${id}`;
+  row.style.cssText = 'display:grid;grid-template-columns:2fr 2fr auto;gap:10px;margin-bottom:10px;align-items:end';
+  row.innerHTML = `
+    <div class="form-field" style="margin:0">
+      <label>Track Title</label>
+      <input type="text" id="url-title-${id}" placeholder="Track title"/>
+    </div>
+    <div class="form-field" style="margin:0">
+      <label>Audio URL (.mp3 / .wav / .ogg)</label>
+      <input type="url" id="url-input-${id}" placeholder="https://example.com/track.mp3"/>
+    </div>
+    <button class="btn-sm btn-danger" style="height:40px;align-self:end" onclick="removeURLRow(${id})" title="Remove row">✕</button>
+  `;
+  container.appendChild(row);
+}
+function removeURLRow(id) {
+  const row = document.getElementById(`url-row-${id}`);
+  if (row) row.remove();
+}
+async function addByURLBatch() {
+  const section = document.getElementById('url-section').value;
+  const statusEl = document.getElementById('url-batch-status');
+  const rows = document.querySelectorAll('[id^="url-row-"]');
+  const valid = [];
+  rows.forEach(row => {
+    const idNum = row.id.replace('url-row-','');
+    const title = document.getElementById(`url-title-${idNum}`)?.value.trim();
+    const url   = document.getElementById(`url-input-${idNum}`)?.value.trim();
+    if (title && url) valid.push({title, url});
+  });
+  if (!valid.length) { toast('Add at least one track with title and URL','error'); return; }
+  statusEl.textContent = `Adding ${valid.length} track(s)...`;
+  let added = 0, failed = 0;
+  for (const item of valid) {
+    const { error } = await sb.from('tracks').insert({title:item.title, url:item.url, section, active:true});
+    if (error) failed++;
+    else added++;
+  }
+  statusEl.textContent = `✓ ${added} added${failed?` · ${failed} failed`:''}`;
+  toast(`${added} track(s) added successfully!`);
+  // Clear rows and reset
+  document.getElementById('url-rows-container').innerHTML = '';
+  urlRowCount = 0;
+  addURLRow(); addURLRow();
+}
+
+/* ── UPLOAD — FILE (Multi-file) ── */
 function switchUploadTab(id, btn) {
   document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('subtab-'+id).classList.add('active');
   btn.classList.add('active');
-}
-
-async function addByURL() {
-  const title   = document.getElementById('url-title').value.trim();
-  const section = document.getElementById('url-section').value;
-  const url     = document.getElementById('url-input').value.trim();
-  if (!title || !url) { toast('Please fill in all fields', 'error'); return; }
-  if (!url.match(/\.(mp3|wav|ogg|aac|m4a)(\?.*)?$/i)) {
-    toast('URL should point to an audio file', 'error'); return;
-  }
-  const { error } = await sb.from('tracks').insert({ title, url, section, active:true });
-  if (error) toast('Error adding track: '+error.message, 'error');
-  else {
-    toast('Track added successfully! ✓');
-    document.getElementById('url-title').value = '';
-    document.getElementById('url-input').value = '';
-  }
+  if (id === 'url') initURLRows();
 }
 
 const uploadZone = document.getElementById('uploadZone');
 uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragging'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragging'));
 uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('dragging');
-  const file = e.dataTransfer.files[0];
-  if (file) processUploadFile(file);
+  e.preventDefault(); uploadZone.classList.remove('dragging');
+  if (e.dataTransfer.files.length) processFileQueue(Array.from(e.dataTransfer.files));
 });
-
 function handleFileSelect(e) {
-  const file = e.target.files[0];
-  if (file) processUploadFile(file);
+  if (e.target.files.length) processFileQueue(Array.from(e.target.files));
 }
 
-async function processUploadFile(file) {
+function processFileQueue(files) {
   const section = document.getElementById('file-section').value;
-  let title = document.getElementById('file-title').value.trim();
-  if (!title) title = file.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
-  const bar    = document.getElementById('uploadProgressBar');
-  const fill   = document.getElementById('uploadProgressFill');
+  const qEl = document.getElementById('file-queue');
+  qEl.innerHTML = '';
+  files.forEach((file, i) => {
+    const item = document.createElement('div');
+    item.id = `fq-${i}`;
+    item.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px';
+    const defaultTitle = file.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
+    item.innerHTML = `
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${file.name} <span style="color:rgba(255,255,255,.25)">(${(file.size/1024/1024).toFixed(1)} MB)</span></div>
+        <input type="text" id="fq-title-${i}" value="${defaultTitle}" style="width:100%;padding:6px 10px;background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.25);border-radius:6px;color:#fff;font-size:12px;font-family:inherit;outline:none"/>
+      </div>
+      <div id="fq-status-${i}" style="font-size:11px;color:var(--muted);white-space:nowrap;min-width:60px;text-align:right">Queued</div>
+    `;
+    qEl.appendChild(item);
+  });
+
+  // Show summary bar
+  const bar = document.getElementById('uploadProgressBar');
+  const fill = document.getElementById('uploadProgressFill');
   const status = document.getElementById('uploadStatus');
-  bar.classList.add('show'); fill.style.width='10%'; status.textContent='Preparing...';
-  try {
-    let uploadBlob = file;
-    const isVideo  = file.type.startsWith('video/');
-    if (isVideo) {
-      try {
-        status.textContent = 'Extracting audio...'; fill.style.width='30%';
-        const arrayBuf = await file.arrayBuffer();
-        const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-        const decoded  = await audioCtx.decodeAudioData(arrayBuf);
-        uploadBlob     = audioBufferToWav(decoded);
-        status.textContent = 'Audio extracted. Uploading...';
-      } catch(e) { throw new Error('Could not extract audio. Try exporting as MP3 first.'); }
-    } else {
-      status.textContent = 'Uploading...';
+  bar.classList.add('show'); fill.style.width='0%';
+  status.innerHTML = `<strong>${files.length}</strong> file(s) queued. <button class="btn-sm btn-primary" style="margin-left:10px;padding:4px 12px" onclick="uploadFileQueue(${JSON.stringify(files.map((_,i)=>i))})">⬆️ Upload All</button>`;
+
+  // Store files reference
+  window._pendingFiles = files;
+}
+
+async function uploadFileQueue(indices) {
+  const files = window._pendingFiles;
+  const section = document.getElementById('file-section').value;
+  const bar = document.getElementById('uploadProgressBar');
+  const fill = document.getElementById('uploadProgressFill');
+  const status = document.getElementById('uploadStatus');
+  let done = 0;
+  for (const i of indices) {
+    const file = files[i];
+    const title = document.getElementById(`fq-title-${i}`)?.value.trim() || file.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
+    const statusEl = document.getElementById(`fq-status-${i}`);
+    statusEl.style.color = 'var(--accent)';
+    statusEl.textContent = 'Uploading…';
+    try {
+      let uploadBlob = file;
+      const isVideo = file.type.startsWith('video/');
+      if (isVideo) {
+        statusEl.textContent = 'Extracting…';
+        try {
+          const arrayBuf = await file.arrayBuffer();
+          const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+          const decoded  = await audioCtx.decodeAudioData(arrayBuf);
+          uploadBlob = audioBufferToWav(decoded);
+        } catch(e) { throw new Error('Audio extract failed'); }
+      }
+      const ext = isVideo ? 'wav' : file.name.split('.').pop().toLowerCase();
+      const fileName = `${Date.now()}_${title.replace(/[^a-z0-9]/gi,'_').toLowerCase()}.${ext}`;
+      const filePath = `${section}/${fileName}`;
+      const { error: upErr } = await sb.storage.from('audio-files').upload(filePath, uploadBlob, {
+        contentType: isVideo?'audio/wav':file.type, upsert:false
+      });
+      if (upErr) throw upErr;
+      const { data: pubData } = sb.storage.from('audio-files').getPublicUrl(filePath);
+      const { error: dbErr } = await sb.from('tracks').insert({ title, url:pubData.publicUrl, section, active:true, file_path:filePath });
+      if (dbErr) throw dbErr;
+      statusEl.style.color = '#4ade80';
+      statusEl.textContent = '✓ Done';
+    } catch(err) {
+      statusEl.style.color = 'var(--accent2)';
+      statusEl.textContent = '✗ Failed';
     }
-    fill.style.width = '60%';
-    const ext      = isVideo ? 'wav' : file.name.split('.').pop().toLowerCase();
-    const fileName = `${Date.now()}_${title.replace(/[^a-z0-9]/gi,'_').toLowerCase()}.${ext}`;
-    const filePath = `${section}/${fileName}`;
-    const { error: upErr } = await sb.storage.from('audio-files').upload(filePath, uploadBlob, {
-      contentType: isVideo ? 'audio/wav' : file.type, upsert:false
-    });
-    if (upErr) throw upErr;
-    fill.style.width = '85%';
-    const { data: pubData } = sb.storage.from('audio-files').getPublicUrl(filePath);
-    const { error: dbErr } = await sb.from('tracks').insert({
-      title, url: pubData.publicUrl, section, active:true, file_path:filePath
-    });
-    if (dbErr) throw dbErr;
-    fill.style.width='100%'; status.textContent='Upload complete! ✓'; toast('Track uploaded! ✓');
-    setTimeout(() => { bar.classList.remove('show'); fill.style.width='0%'; status.textContent=''; }, 2000);
-    document.getElementById('file-title').value='';
-    document.getElementById('fileInput').value='';
-  } catch(err) {
-    toast('Upload failed: '+err.message, 'error');
-    bar.classList.remove('show'); fill.style.width='0%'; status.textContent='';
+    done++;
+    fill.style.width = Math.round((done/indices.length)*100)+'%';
   }
+  status.textContent = `✓ All files processed (${done}/${indices.length})`;
+  toast(`Upload complete — ${done} track(s) added`);
+  window._pendingFiles = null;
 }
 
 function audioBufferToWav(buffer) {
@@ -782,15 +881,13 @@ function audioBufferToWav(buffer) {
 /* ── SCHEDULE ── */
 const SCHEDULE_TEMPLATES = {
   workhours: { section:'music',   days:['mon','tue','wed','thu','fri'], start:8,  end:18 },
-  morning:   { section:'sermons', days:['mon','tue','wed','thu','fri','sat','sun'], start:5, end:9 },
+  morning:   { section:'sermons', days:['mon','tue','wed','thu','fri','sat','sun'], start:5,  end:9 },
   evening:   { section:'sermons', days:['mon','tue','wed','thu','fri','sat','sun'], start:18, end:22 },
   kids:      { section:'kids',    days:['sat','sun'], start:9, end:12 },
-  allday:    { section:'music',   days:['mon','tue','wed','thu','fri','sat','sun'], start:0, end:24 },
+  allday:    { section:'music',   days:['mon','tue','wed','thu','fri','sat','sun'], start:0,  end:24 },
 };
-
 function applyTemplate(key) {
-  const t = SCHEDULE_TEMPLATES[key];
-  if (!t) return;
+  const t = SCHEDULE_TEMPLATES[key]; if (!t) return;
   document.getElementById('sched-section').value = t.section;
   document.getElementById('sched-start').value   = t.start;
   document.getElementById('sched-end').value     = t.end;
@@ -798,13 +895,11 @@ function applyTemplate(key) {
   Array.from(daysSel.options).forEach(o => { o.selected = t.days.includes(o.value); });
   toast('Template applied — review and click Save Block');
 }
-
 async function loadScheduleBlocks() {
   const { data } = await sb.from('schedule_blocks').select('*').order('start_hour');
   const container = document.getElementById('schedule-blocks-list');
-  container.innerHTML = (data||[]).map(b => `
-    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;
-      padding:14px 18px;margin-bottom:10px" id="sblock-${b.id}">
+  container.innerHTML = (data||[]).map(b=>`
+    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px" id="sblock-${b.id}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <span class="badge ${b.section}">${b.section}</span>
@@ -812,15 +907,11 @@ async function loadScheduleBlocks() {
           <span style="font-size:11px;color:var(--muted)">${b.days.join(', ')}</span>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn-sm btn-secondary" onclick="startEditBlock('${b.id}','${b.section}',${b.start_hour},${b.end_hour},'${b.days.join(',')}')">✏️ Edit</button>
-          <label class="toggle">
-            <input type="checkbox" ${b.active?'checked':''} onchange="toggleScheduleBlock('${b.id}',this.checked)"/>
-            <span class="toggle-slider"></span>
-          </label>
+          <button class="btn-sm btn-secondary" onclick="startEditBlock('${b.id}')">✏️ Edit</button>
+          <label class="toggle"><input type="checkbox" ${b.active?'checked':''} onchange="toggleScheduleBlock('${b.id}',this.checked)"/><span class="toggle-slider"></span></label>
           <button class="btn-sm btn-danger" onclick="deleteScheduleBlock('${b.id}')">🗑</button>
         </div>
       </div>
-      <!-- inline edit form (hidden by default) -->
       <div id="edit-form-${b.id}" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07)">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
           <div class="form-field">
@@ -839,14 +930,8 @@ async function loadScheduleBlocks() {
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div class="form-field">
-            <label>Start Hour</label>
-            <input type="number" id="edit-start-${b.id}" min="0" max="23" value="${b.start_hour}"/>
-          </div>
-          <div class="form-field">
-            <label>End Hour</label>
-            <input type="number" id="edit-end-${b.id}" min="1" max="24" value="${b.end_hour}"/>
-          </div>
+          <div class="form-field"><label>Start Hour</label><input type="number" id="edit-start-${b.id}" min="0" max="23" value="${b.start_hour}"/></div>
+          <div class="form-field"><label>End Hour</label><input type="number" id="edit-end-${b.id}" min="1" max="24" value="${b.end_hour}"/></div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn-sm btn-primary" onclick="saveEditBlock('${b.id}')">✓ Save Changes</button>
@@ -855,98 +940,181 @@ async function loadScheduleBlocks() {
       </div>
     </div>`).join('') || '<p style="color:var(--muted);font-size:13px;padding:8px 0">No schedule blocks yet.</p>';
 }
-
-function startEditBlock(id) {
-  document.getElementById('edit-form-'+id).style.display = 'block';
-}
-function cancelEditBlock(id) {
-  document.getElementById('edit-form-'+id).style.display = 'none';
-}
-
+function startEditBlock(id) { document.getElementById('edit-form-'+id).style.display='block'; }
+function cancelEditBlock(id) { document.getElementById('edit-form-'+id).style.display='none'; }
 async function saveEditBlock(id) {
   const section    = document.getElementById('edit-section-'+id).value;
   const start_hour = parseInt(document.getElementById('edit-start-'+id).value);
   const end_hour   = parseInt(document.getElementById('edit-end-'+id).value);
   const daysSel    = document.getElementById('edit-days-'+id);
-  const days       = Array.from(daysSel.selectedOptions).map(o => o.value);
-  if (end_hour <= start_hour) { toast('End must be greater than start', 'error'); return; }
-  if (!days.length) { toast('Select at least one day', 'error'); return; }
-  const { error } = await sb.from('schedule_blocks').update({ section, start_hour, end_hour, days }).eq('id', id);
-  if (error) toast('Error saving: '+error.message, 'error');
+  const days       = Array.from(daysSel.selectedOptions).map(o=>o.value);
+  if (end_hour<=start_hour) { toast('End must be greater than start','error'); return; }
+  if (!days.length) { toast('Select at least one day','error'); return; }
+  const { error } = await sb.from('schedule_blocks').update({section,start_hour,end_hour,days}).eq('id',id);
+  if (error) toast('Error saving: '+error.message,'error');
   else { toast('Block updated ✓'); await loadScheduleBlocks(); }
 }
-
 async function saveScheduleBlock() {
   const section    = document.getElementById('sched-section').value;
   const start_hour = parseInt(document.getElementById('sched-start').value);
   const end_hour   = parseInt(document.getElementById('sched-end').value);
   const daysSel    = document.getElementById('sched-days');
-  const days       = Array.from(daysSel.selectedOptions).map(o => o.value);
-  if (end_hour <= start_hour) { toast('End hour must be greater than start hour', 'error'); return; }
-  if (!days.length) { toast('Select at least one day', 'error'); return; }
-  const { error } = await sb.from('schedule_blocks').insert({ section, start_hour, end_hour, days, active:true });
-  if (error) toast('Error saving block: '+error.message, 'error');
+  const days       = Array.from(daysSel.selectedOptions).map(o=>o.value);
+  if (end_hour<=start_hour) { toast('End hour must be greater than start hour','error'); return; }
+  if (!days.length) { toast('Select at least one day','error'); return; }
+  const { error } = await sb.from('schedule_blocks').insert({section,start_hour,end_hour,days,active:true});
+  if (error) toast('Error saving block: '+error.message,'error');
   else { toast('Schedule block saved! ✓'); await loadScheduleBlocks(); }
 }
-
 async function toggleScheduleBlock(id, val) {
-  await sb.from('schedule_blocks').update({ active:val }).eq('id', id);
-  toast(val ? 'Block enabled ✓' : 'Block disabled');
+  await sb.from('schedule_blocks').update({active:val}).eq('id',id);
+  toast(val?'Block enabled ✓':'Block disabled');
 }
-
 async function deleteScheduleBlock(id) {
   if (!confirm('Delete this schedule block?')) return;
-  await sb.from('schedule_blocks').delete().eq('id', id);
+  await sb.from('schedule_blocks').delete().eq('id',id);
   toast('Block deleted');
   await loadScheduleBlocks();
 }
 
-/* ── SETTINGS ── */
-const TEMPLATES_DEF = {
-  default:  { name:'Default',      emoji:'🌌' },
-  midnight: { name:'Midnight Blue', emoji:'🌃' },
-  rose:     { name:'Rose Garden',   emoji:'🌹' },
-  forest:   { name:'Forest Green',  emoji:'🌿' },
-  gold:     { name:'Sacred Gold',   emoji:'✨' },
+/* ── SETTINGS — TEMPLATES (10 total, editable) ── */
+// Stored in localStorage so edits survive page reload without a DB call
+const DEFAULT_TEMPLATES = {
+  default:   { name:'Default',        emoji:'🌌', accent:'#ffd89b', accent2:'#ff6b95', accent3:'#9796f0', cardBg:'rgba(12,3,30,.72)',  borderRadius:'20px' },
+  midnight:  { name:'Midnight Blue',  emoji:'🌃', accent:'#60a5fa', accent2:'#818cf8', accent3:'#a78bfa', cardBg:'rgba(5,10,30,.78)',  borderRadius:'16px' },
+  rose:      { name:'Rose Garden',    emoji:'🌹', accent:'#fda4af', accent2:'#fb7185', accent3:'#f43f5e', cardBg:'rgba(30,5,15,.78)',  borderRadius:'24px' },
+  forest:    { name:'Forest Green',   emoji:'🌿', accent:'#86efac', accent2:'#4ade80', accent3:'#22c55e', cardBg:'rgba(5,18,10,.78)',  borderRadius:'18px' },
+  gold:      { name:'Sacred Gold',    emoji:'✨', accent:'#fcd34d', accent2:'#f59e0b', accent3:'#d97706', cardBg:'rgba(25,15,3,.82)',  borderRadius:'14px' },
+  // 5 NEW BRIGHT THEMES
+  sunrise:   { name:'Sunrise Blaze',  emoji:'🌅', accent:'#ff9a3c', accent2:'#ff4e6a', accent3:'#ffe66d', cardBg:'rgba(40,10,5,.70)',  borderRadius:'22px' },
+  electric:  { name:'Electric Cyan',  emoji:'⚡', accent:'#00f5ff', accent2:'#0080ff', accent3:'#7b2fff', cardBg:'rgba(0,8,30,.72)',   borderRadius:'18px' },
+  candy:     { name:'Candy Pop',      emoji:'🍬', accent:'#ff6ef7', accent2:'#ff85a1', accent3:'#ffdb4d', cardBg:'rgba(25,5,30,.70)',  borderRadius:'26px' },
+  arctic:    { name:'Arctic White',   emoji:'❄️', accent:'#e0f7ff', accent2:'#aee8ff', accent3:'#78d6ff', cardBg:'rgba(5,15,30,.65)',  borderRadius:'16px' },
+  volcano:   { name:'Volcano',        emoji:'🌋', accent:'#ff5722', accent2:'#ff8c00', accent3:'#ffcc02', cardBg:'rgba(30,8,3,.78)',   borderRadius:'20px' },
 };
-
-const BUILTIN_BGS = {
-  nebula:    { label:'Nebula',    emoji:'🔭' },
-  aurora:    { label:'Aurora',    emoji:'🌌' },
-  forest:    { label:'Forest',    emoji:'🌲' },
-  ocean:     { label:'Ocean',     emoji:'🌊' },
-  mountains: { label:'Mountains', emoji:'⛰️' },
-};
-
-function renderTemplateGrid(activeKey) {
-  const grid = document.getElementById('templateGrid');
-  grid.innerHTML = Object.entries(TEMPLATES_DEF).map(([key, t]) => `
-    <button onclick="selectTemplate('${key}')" id="tpl-${key}"
-      style="padding:12px 10px;border-radius:10px;border:2px solid ${activeKey===key?'var(--accent)':'rgba(255,255,255,.12)'};
-      background:${activeKey===key?'rgba(192,132,252,.15)':'rgba(255,255,255,.04)'};
-      color:${activeKey===key?'var(--accent)':'var(--muted)'};cursor:pointer;
-      font-size:12px;font-weight:700;font-family:inherit;transition:all 180ms;text-align:center;line-height:1.6">
-      ${t.emoji}<br>${t.name}
-    </button>`).join('');
+function getTemplates() {
+  try {
+    const saved = localStorage.getItem('masalio_templates');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
+  } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_TEMPLATES)); }
+}
+function saveTemplatesLocal(tpls) {
+  localStorage.setItem('masalio_templates', JSON.stringify(tpls));
 }
 
+function renderTemplateGrid(activeKey) {
+  const tpls = getTemplates();
+  const grid = document.getElementById('templateGrid');
+  grid.innerHTML = Object.entries(tpls).map(([key, t]) => `
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <button onclick="selectTemplate('${key}')"
+        style="padding:12px 10px;border-radius:10px;
+        border:2px solid ${activeKey===key?t.accent:'rgba(255,255,255,.12)'};
+        background:${activeKey===key?'rgba(255,255,255,.12)':'rgba(255,255,255,.04)'};
+        color:${activeKey===key?t.accent:'var(--muted)'};cursor:pointer;
+        font-size:12px;font-weight:700;font-family:inherit;transition:all 180ms;text-align:center;line-height:1.8">
+        ${t.emoji}<br>${t.name}
+        <div style="display:flex;gap:3px;justify-content:center;margin-top:6px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${t.accent};display:inline-block"></span>
+          <span style="width:10px;height:10px;border-radius:50%;background:${t.accent2};display:inline-block"></span>
+          <span style="width:10px;height:10px;border-radius:50%;background:${t.accent3};display:inline-block"></span>
+        </div>
+      </button>
+      <button onclick="openThemeEditor('${key}')"
+        style="padding:4px 6px;border-radius:7px;border:1px solid rgba(255,255,255,.12);
+        background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);
+        font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 160ms">
+        ✏️ Edit
+      </button>
+    </div>`).join('');
+}
 function selectTemplate(key) {
   document.getElementById('set-template').value = key;
   renderTemplateGrid(key);
 }
+function openThemeEditor(key) {
+  const tpls = getTemplates();
+  const t = tpls[key]; if (!t) return;
+  document.getElementById('te-key').value = key;
+  document.getElementById('te-name').value = t.name;
+  document.getElementById('te-name-display').textContent = t.name;
+  document.getElementById('te-emoji').value = t.emoji;
+  document.getElementById('te-accent').value = t.accent;
+  document.getElementById('te-accent-hex').value = t.accent;
+  document.getElementById('te-accent2').value = t.accent2;
+  document.getElementById('te-accent2-hex').value = t.accent2;
+  document.getElementById('te-accent3').value = t.accent3;
+  document.getElementById('te-accent3-hex').value = t.accent3;
+  document.getElementById('te-cardbg').value = t.cardBg;
+  document.getElementById('te-radius').value = t.borderRadius;
+  updatePreviewSwatch();
+  document.getElementById('theme-editor').style.display = 'block';
+  document.getElementById('theme-editor').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeThemeEditor() { document.getElementById('theme-editor').style.display='none'; }
+function syncColor(colorId, hexId) {
+  const hex = document.getElementById(hexId).value;
+  if (/^#[0-9a-fA-F]{6}$/.test(hex)) document.getElementById(colorId).value = hex;
+  updatePreviewSwatch();
+}
+function updatePreviewSwatch() {
+  const a1 = document.getElementById('te-accent').value;
+  const a2 = document.getElementById('te-accent2').value;
+  const a3 = document.getElementById('te-accent3').value;
+  document.getElementById('te-preview-swatch').style.background = `linear-gradient(90deg,${a1},${a2},${a3})`;
+}
+document.addEventListener('input', e => {
+  if (['te-accent','te-accent2','te-accent3'].includes(e.target.id)) {
+    document.getElementById(e.target.id+'-hex').value = e.target.value;
+    updatePreviewSwatch();
+  }
+});
+function saveThemeEdit() {
+  const key  = document.getElementById('te-key').value;
+  const tpls = getTemplates();
+  tpls[key] = {
+    name:         document.getElementById('te-name').value.trim() || tpls[key].name,
+    emoji:        document.getElementById('te-emoji').value.trim() || tpls[key].emoji,
+    accent:       document.getElementById('te-accent').value,
+    accent2:      document.getElementById('te-accent2').value,
+    accent3:      document.getElementById('te-accent3').value,
+    cardBg:       document.getElementById('te-cardbg').value,
+    borderRadius: document.getElementById('te-radius').value,
+  };
+  saveTemplatesLocal(tpls);
+  const activeKey = document.getElementById('set-template').value;
+  renderTemplateGrid(activeKey);
+  closeThemeEditor();
+  toast('Theme updated ✓ — save settings to push to client');
+}
 
+/* ── SETTINGS — BACKGROUNDS (10 total, bright, with watermark) ── */
+const BUILTIN_BGS = {
+  nebula:     { label:'Nebula',        emoji:'🔭', url:'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1600&q=90' },
+  aurora:     { label:'Aurora',        emoji:'🌌', url:'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&q=90' },
+  forest:     { label:'Forest',        emoji:'🌲', url:'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=90' },
+  ocean:      { label:'Ocean',         emoji:'🌊', url:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=90' },
+  mountains:  { label:'Mountains',     emoji:'⛰️', url:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=90' },
+  // 5 NEW
+  sunset:     { label:'Sunset Coast',  emoji:'🌇', url:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1600&q=90' },
+  milkyway:   { label:'Milky Way',     emoji:'🌠', url:'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1600&q=90' },
+  tropical:   { label:'Tropical',      emoji:'🌴', url:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=90' },
+  waterfall:  { label:'Waterfall',     emoji:'💧', url:'https://images.unsplash.com/photo-1546768292-fb12f6c92568?w=1600&q=90' },
+  desert:     { label:'Desert Dunes',  emoji:'🏜️', url:'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1600&q=90' },
+};
 function renderBgGrid(activeKey) {
   const grid = document.getElementById('bgGrid');
   grid.innerHTML = Object.entries(BUILTIN_BGS).map(([key, b]) => `
-    <button onclick="selectBg('${key}')" id="bg-${key}"
-      style="padding:12px 10px;border-radius:10px;border:2px solid ${activeKey===key?'var(--accent)':'rgba(255,255,255,.12)'};
+    <button onclick="selectBg('${key}')"
+      style="padding:12px 10px;border-radius:10px;
+      border:2px solid ${activeKey===key?'var(--accent)':'rgba(255,255,255,.12)'};
       background:${activeKey===key?'rgba(192,132,252,.15)':'rgba(255,255,255,.04)'};
       color:${activeKey===key?'var(--accent)':'var(--muted)'};cursor:pointer;
       font-size:12px;font-weight:700;font-family:inherit;transition:all 180ms;text-align:center;line-height:1.6">
       ${b.emoji}<br>${b.label}
+      ${activeKey===key?'<br><span style="font-size:9px;opacity:.7">✓ Active</span>':''}
     </button>`).join('');
 }
-
 function selectBg(key) {
   document.getElementById('set-activebg').value = key;
   renderBgGrid(key);
@@ -954,8 +1122,7 @@ function selectBg(key) {
 
 async function loadSettingsForm() {
   const { data } = await sb.from('settings').select('key,value');
-  const s = {};
-  (data||[]).forEach(r => s[r.key] = r.value);
+  const s = {}; (data||[]).forEach(r => s[r.key]=r.value);
   document.getElementById('set-title').value     = s.site_title || '';
   document.getElementById('set-wa').value        = s.whatsapp_number || '';
   document.getElementById('set-logo').value      = s.logo_url || '';
@@ -963,69 +1130,90 @@ async function loadSettingsForm() {
   document.getElementById('set-testimony').value = s.testimony_url || '';
   document.getElementById('set-donate').value    = s.donate_url || '';
   document.getElementById('set-custombg').value  = s.custom_bg_url || '';
-
   const activeTemplate = s.active_template || 'default';
   const activeBg       = s.active_bg || 'nebula';
-  document.getElementById('set-template').value  = activeTemplate;
-  document.getElementById('set-activebg').value  = activeBg;
-
+  document.getElementById('set-template').value = activeTemplate;
+  document.getElementById('set-activebg').value = activeBg;
   renderTemplateGrid(activeTemplate);
   renderBgGrid(activeBg);
-
   if (s.logo_url) previewLogo(s.logo_url);
-  if (s.logo_url) {
-    const mark = document.getElementById('sidebarLogoMark');
-    mark.innerHTML = `<img src="${s.logo_url}" alt="Logo"/>`;
-  }
+  if (s.logo_url) { document.getElementById('sidebarLogoMark').innerHTML=`<img src="${s.logo_url}" alt="Logo"/>`; }
 }
-
 function previewLogo(url) {
-  const preview = document.getElementById('logoPreview');
-  const img     = document.getElementById('logoPreviewImg');
-  if (url) { img.src=url; preview.style.display='flex'; }
-  else { preview.style.display='none'; }
+  const preview=document.getElementById('logoPreview'), img=document.getElementById('logoPreviewImg');
+  if (url) { img.src=url; preview.style.display='flex'; } else { preview.style.display='none'; }
 }
-
 async function saveSettings() {
+  const tpls = getTemplates();
+  const activeTemplateKey = document.getElementById('set-template').value;
+  const activeTpl = tpls[activeTemplateKey] || tpls.default;
   const rows = [
-    { key:'site_title',      value:document.getElementById('set-title').value },
-    { key:'whatsapp_number', value:document.getElementById('set-wa').value },
-    { key:'logo_url',        value:document.getElementById('set-logo').value },
-    { key:'prayer_url',      value:document.getElementById('set-prayer').value },
-    { key:'testimony_url',   value:document.getElementById('set-testimony').value },
-    { key:'donate_url',      value:document.getElementById('set-donate').value },
-    { key:'active_template', value:document.getElementById('set-template').value },
-    { key:'active_bg',       value:document.getElementById('set-activebg').value },
-    { key:'custom_bg_url',   value:document.getElementById('set-custombg').value },
+    { key:'site_title',       value:document.getElementById('set-title').value },
+    { key:'whatsapp_number',  value:document.getElementById('set-wa').value },
+    { key:'logo_url',         value:document.getElementById('set-logo').value },
+    { key:'prayer_url',       value:document.getElementById('set-prayer').value },
+    { key:'testimony_url',    value:document.getElementById('set-testimony').value },
+    { key:'donate_url',       value:document.getElementById('set-donate').value },
+    { key:'active_template',  value:activeTemplateKey },
+    { key:'active_bg',        value:document.getElementById('set-activebg').value },
+    { key:'custom_bg_url',    value:document.getElementById('set-custombg').value },
+    { key:'theme_json',       value:JSON.stringify(activeTpl) },
   ];
-  for (const row of rows) {
-    await sb.from('settings').upsert(row, { onConflict:'key' });
-  }
-  toast('Settings saved! Client will reflect changes immediately ✓');
+  for (const row of rows) await sb.from('settings').upsert(row,{onConflict:'key'});
+  toast('Settings saved! Client reflects changes immediately ✓');
   const logoUrl = document.getElementById('set-logo').value;
-  const mark = document.getElementById('sidebarLogoMark');
-  mark.innerHTML = logoUrl ? `<img src="${logoUrl}" alt="Logo"/>` : '🎙️';
+  document.getElementById('sidebarLogoMark').innerHTML = logoUrl?`<img src="${logoUrl}" alt="Logo"/>`:'🎙️';
 }
-
 async function changePassword() {
-  const newPwd  = document.getElementById('new-pwd').value;
-  const confPwd = document.getElementById('confirm-pwd').value;
-  if (!newPwd) { toast('Enter a new password', 'error'); return; }
-  if (newPwd !== confPwd) { toast('Passwords do not match', 'error'); return; }
-  if (newPwd.length < 8) { toast('Password must be at least 8 characters', 'error'); return; }
+  const newPwd=document.getElementById('new-pwd').value, confPwd=document.getElementById('confirm-pwd').value;
+  if (!newPwd) { toast('Enter a new password','error'); return; }
+  if (newPwd!==confPwd) { toast('Passwords do not match','error'); return; }
+  if (newPwd.length<8) { toast('Password must be at least 8 characters','error'); return; }
   const hash = await sha256(newPwd);
-  await sb.from('settings').upsert({ key:'admin_password_hash', value:hash }, { onConflict:'key' });
+  await sb.from('settings').upsert({key:'admin_password_hash',value:hash},{onConflict:'key'});
   toast('Password updated! ✓');
   document.getElementById('new-pwd').value='';
   document.getElementById('confirm-pwd').value='';
 }
-
 async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-checkAuth().then(() => loadDashboard());
+checkAuth().then(()=>{ loadDashboard(); initURLRows(); subscribeAdminRealtime(); });
+
+function subscribeAdminRealtime() {
+  // Tracks table → auto-refresh track list when on tracks page
+  sb.channel('admin:tracks')
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'tracks'
+    }, () => {
+      const tracksPage = document.getElementById('page-tracks');
+      if (tracksPage && tracksPage.classList.contains('active')) loadTracks();
+      loadDashboard();
+    })
+    .subscribe();
+
+  // Schedule blocks → auto-refresh schedule page
+  sb.channel('admin:schedule')
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'schedule_blocks'
+    }, () => {
+      const schedPage = document.getElementById('page-schedule');
+      if (schedPage && schedPage.classList.contains('active')) loadScheduleBlocks();
+    })
+    .subscribe();
+
+  // Play events → refresh dashboard stats live
+  sb.channel('admin:play_events')
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'play_events'
+    }, () => {
+      const dashPage = document.getElementById('page-dashboard');
+      if (dashPage && dashPage.classList.contains('active')) loadDashboard();
+    })
+    .subscribe();
+}
 </script>
 </body>
 </html>
