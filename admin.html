@@ -31,7 +31,6 @@ body::before{content:'';position:fixed;top:-20%;left:-10%;width:500px;height:500
 body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:600px;height:600px;
   background:radial-gradient(circle,rgba(236,72,153,.15) 0%,transparent 70%);pointer-events:none;z-index:0}
 
-/* SIDEBAR */
 .sidebar{width:230px;background:rgba(10,1,26,.85);backdrop-filter:blur(20px);
   border-right:1px solid var(--border);display:flex;flex-direction:column;
   padding:20px 0;flex-shrink:0;min-height:100vh;position:relative;z-index:1}
@@ -58,14 +57,12 @@ body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:600px;height:
   font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 200ms;letter-spacing:.3px}
 .logout-btn:hover{background:rgba(244,114,182,.15)}
 
-/* CONTENT */
 .content{flex:1;padding:28px;overflow-y:auto;position:relative;z-index:1}
 .page{display:none}.page.active{display:block}
 .page-title{font-size:22px;font-weight:900;margin-bottom:22px;
   background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   display:inline-block}
 
-/* STAT CARDS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
 .stat-card{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;
   padding:18px;position:relative;overflow:hidden;transition:transform 200ms,box-shadow 200ms;cursor:default}
@@ -80,7 +77,6 @@ body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:600px;height:
 .stat-lbl{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;letter-spacing:.3px}
 .stat-icon{position:absolute;right:16px;top:16px;font-size:26px;opacity:.2}
 
-/* TABLE */
 .track-table-wrap{background:rgba(255,255,255,.04);border:1px solid var(--border);
   border-radius:14px;overflow:hidden}
 .table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;
@@ -99,13 +95,11 @@ td{padding:11px 18px;font-size:13px;border-bottom:1px solid rgba(168,85,247,.07)
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(168,85,247,.05)}
 
-/* BADGES */
 .badge{display:inline-block;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;letter-spacing:.3px}
 .badge.music{background:rgba(192,132,252,.15);color:#c084fc;border:1px solid rgba(192,132,252,.35)}
 .badge.sermons{background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.35)}
 .badge.kids{background:rgba(244,114,182,.15);color:#f472b6;border:1px solid rgba(244,114,182,.35)}
 
-/* TOGGLE */
 .toggle{position:relative;display:inline-block;width:38px;height:21px}
 .toggle input{opacity:0;width:0;height:0}
 .toggle-slider{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.15);
@@ -115,7 +109,6 @@ tr:hover td{background:rgba(168,85,247,.05)}
 input:checked+.toggle-slider{background:var(--grad)}
 input:checked+.toggle-slider::before{transform:translateX(17px)}
 
-/* BUTTONS */
 .btn-sm{padding:5px 11px;border-radius:6px;font-size:11px;font-weight:700;
   cursor:pointer;border:1px solid;font-family:inherit;transition:all 150ms}
 .btn-danger{background:rgba(244,114,182,.1);border-color:rgba(244,114,182,.4);color:var(--accent2)}
@@ -124,7 +117,6 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
 .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
 .btn-secondary{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);color:var(--text)}
 
-/* FORMS */
 .form-card{background:rgba(255,255,255,.04);border:1px solid var(--border);
   border-radius:14px;padding:22px;margin-bottom:20px;
   box-shadow:0 4px 20px rgba(0,0,0,.2)}
@@ -151,7 +143,6 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
   letter-spacing:.3px;box-shadow:0 6px 20px rgba(147,51,234,.35)}
 .btn-full:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(147,51,234,.5)}
 
-/* UPLOAD ZONE */
 .upload-zone{border:2px dashed rgba(192,132,252,.3);border-radius:10px;padding:36px;
   text-align:center;cursor:pointer;transition:all 200ms;background:rgba(168,85,247,.03)}
 .upload-zone:hover,.upload-zone.dragging{border-color:var(--accent);background:rgba(168,85,247,.08)}
@@ -163,12 +154,10 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
 .progress-bar-fill{height:100%;background:var(--grad);border-radius:3px;transition:width 300ms;width:0%}
 .progress-bar.show{display:block}
 
-/* SCHEDULE */
 .sched-legend{display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap}
 .sched-leg-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted)}
 .sched-leg-dot{width:13px;height:13px;border-radius:4px}
 
-/* TABS / FILTERS */
 .tab-btns{display:flex;gap:8px;margin-bottom:18px}
 .tab-btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;
   border:1px solid rgba(168,85,247,.25);background:transparent;color:var(--muted);
@@ -183,7 +172,6 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
 .filter-btn.active{background:var(--grad);color:#fff;border:none;
   box-shadow:0 4px 12px rgba(147,51,234,.4)}
 
-/* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;padding:13px 20px;border-radius:10px;
   font-size:13px;font-weight:700;z-index:9999;animation:toastIn 300ms ease;
   box-shadow:0 10px 30px rgba(0,0,0,.4);backdrop-filter:blur(10px)}
@@ -191,7 +179,6 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
 .toast.error{background:rgba(244,114,182,.9);color:#fff}
 @keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-/* SCROLLBAR */
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(168,85,247,.3);border-radius:3px}
@@ -346,8 +333,7 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
             </select>
           </div>
         </div>
-        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
-          ondragover="e=>e.preventDefault()" ondrop="handleDrop(event)">
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
           <div class="upload-zone-icon">🎶</div>
           <p><strong>Click to choose file</strong> or drag and drop here</p>
           <p style="font-size:11px;margin-top:6px;color:rgba(255,255,255,.3)">Max 50MB per file</p>
@@ -478,74 +464,79 @@ let currentFilter = 'all';
 
 async function checkAuth() {
   const token = sessionStorage.getItem('adminToken');
-  if (!token) { window.location.href='admin-login.html'; return; }
-  const { data } = await sb.from('admin_sessions').select('*').eq('token',token).single();
+  if (!token) { window.location.href = 'admin-login.html'; return; }
+  const { data } = await sb.from('admin_sessions').select('*').eq('token', token).single();
   if (!data || new Date(data.expires_at) < new Date()) {
     sessionStorage.removeItem('adminToken');
-    window.location.href='admin-login.html';
+    window.location.href = 'admin-login.html';
   }
 }
 
 function doLogout() {
   const token = sessionStorage.getItem('adminToken');
-  if (token) sb.from('admin_sessions').delete().eq('token',token).then(()=>{});
+  if (token) sb.from('admin_sessions').delete().eq('token', token).then(() => {});
   sessionStorage.removeItem('adminToken');
-  window.location.href='admin-login.html';
+  window.location.href = 'admin-login.html';
 }
 
 function showPage(id, el) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
   el.classList.add('active');
-  if (id==='tracks') loadTracks();
-  if (id==='dashboard') loadDashboard();
-  if (id==='schedule') loadScheduleBlocks();
-  if (id==='settings') loadSettingsForm();
+  if (id === 'tracks')   loadTracks();
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'schedule') loadScheduleBlocks();
+  if (id === 'settings') loadSettingsForm();
 }
 
-function toast(msg, type='success') {
+function toast(msg, type = 'success') {
   const t = document.createElement('div');
   t.className = `toast ${type}`;
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 3000);
+  setTimeout(() => t.remove(), 3000);
 }
 
 async function loadDashboard() {
   const { data: tracks } = await sb.from('tracks').select('section, active');
-  const music   = (tracks||[]).filter(t=>t.section==='music'&&t.active).length;
-  const sermons = (tracks||[]).filter(t=>t.section==='sermons'&&t.active).length;
-  const kids    = (tracks||[]).filter(t=>t.section==='kids'&&t.active).length;
-  document.getElementById('stat-music').textContent = music;
+  const music   = (tracks || []).filter(t => t.section === 'music'   && t.active).length;
+  const sermons = (tracks || []).filter(t => t.section === 'sermons' && t.active).length;
+  const kids    = (tracks || []).filter(t => t.section === 'kids'    && t.active).length;
+  document.getElementById('stat-music').textContent   = music;
   document.getElementById('stat-sermons').textContent = sermons;
-  document.getElementById('stat-kids').textContent = kids;
+  document.getElementById('stat-kids').textContent    = kids;
 
   const today = new Date().toISOString().split('T')[0];
-  const { count } = await sb.from('play_events').select('*',{count:'exact',head:true})
-    .gte('played_at', today+'T00:00:00');
-  document.getElementById('stat-plays').textContent = count||0;
+  const { count } = await sb.from('play_events')
+    .select('*', { count: 'exact', head: true })
+    .gte('played_at', today + 'T00:00:00');
+  document.getElementById('stat-plays').textContent = count || 0;
 
-  const { data: plays } = await sb.from('play_events').select('played_at, section, tracks(title)')
-    .order('played_at',{ascending:false}).limit(20);
+  // FIX: use explicit foreign key hint track_id!inner to avoid ambiguous join
+  const { data: plays } = await sb.from('play_events')
+    .select('played_at, section, track_id, tracks!play_events_track_id_fkey(title)')
+    .order('played_at', { ascending: false })
+    .limit(20);
+
   const tbody = document.getElementById('recent-plays-body');
-  tbody.innerHTML = (plays||[]).map(p=>`
+  tbody.innerHTML = (plays || []).map(p => `
     <tr>
-      <td>${p.tracks?.title||'Unknown'}</td>
+      <td>${p.tracks?.title || 'Unknown'}</td>
       <td><span class="badge ${p.section}">${p.section}</span></td>
       <td style="color:var(--muted);font-size:11px">${new Date(p.played_at).toLocaleString()}</td>
     </tr>`).join('');
 }
 
 async function loadTracks() {
-  const { data } = await sb.from('tracks').select('*').order('section').order('created_at',{ascending:false});
-  allTracks = data||[];
+  const { data } = await sb.from('tracks').select('*').order('section').order('created_at', { ascending: false });
+  allTracks = data || [];
   renderTracks();
 }
 
 function filterTracks(section, btn) {
   currentFilter = section;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderTracks();
 }
@@ -553,45 +544,45 @@ function filterTracks(section, btn) {
 function renderTracks() {
   const q = document.getElementById('trackSearch').value.toLowerCase();
   const filtered = allTracks.filter(t => {
-    const sectionMatch = currentFilter==='all' || t.section===currentFilter;
-    const searchMatch  = !q || t.title.toLowerCase().includes(q) || t.url.toLowerCase().includes(q);
+    const sectionMatch = currentFilter === 'all' || t.section === currentFilter;
+    const searchMatch  = !q || t.title.toLowerCase().includes(q) || (t.url || '').toLowerCase().includes(q);
     return sectionMatch && searchMatch;
   });
-  document.getElementById('tracks-body').innerHTML = filtered.map((t,i)=>`
+  document.getElementById('tracks-body').innerHTML = filtered.map((t, i) => `
     <tr>
-      <td style="color:var(--muted);width:40px;font-size:12px">${i+1}</td>
+      <td style="color:var(--muted);width:40px;font-size:12px">${i + 1}</td>
       <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.title}">${t.title}</td>
       <td><span class="badge ${t.section}">${t.section}</span></td>
       <td>
         <label class="toggle">
-          <input type="checkbox" ${t.active?'checked':''} onchange="toggleActive('${t.id}',this.checked)"/>
+          <input type="checkbox" ${t.active ? 'checked' : ''} onchange="toggleActive('${t.id}',this.checked)"/>
           <span class="toggle-slider"></span>
         </label>
       </td>
       <td>
-        <button class="btn-sm btn-danger" onclick="deleteTrack('${t.id}','${t.file_path||''}')">🗑</button>
+        <button class="btn-sm btn-danger" onclick="deleteTrack('${t.id}','${t.file_path || ''}')">🗑</button>
       </td>
     </tr>`).join('');
 }
 
 async function toggleActive(id, val) {
-  const { error } = await sb.from('tracks').update({active:val}).eq('id',id);
-  if (error) toast('Error updating track','error');
-  else toast(val?'Track enabled ✓':'Track disabled');
+  const { error } = await sb.from('tracks').update({ active: val }).eq('id', id);
+  if (error) toast('Error updating track', 'error');
+  else toast(val ? 'Track enabled ✓' : 'Track disabled');
 }
 
 async function deleteTrack(id, filePath) {
   if (!confirm('Delete this track? This cannot be undone.')) return;
   if (filePath) await sb.storage.from('audio-files').remove([filePath]);
-  const { error } = await sb.from('tracks').delete().eq('id',id);
-  if (error) toast('Delete failed','error');
+  const { error } = await sb.from('tracks').delete().eq('id', id);
+  if (error) toast('Delete failed', 'error');
   else { toast('Track deleted'); await loadTracks(); }
 }
 
 function switchUploadTab(id, btn) {
-  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('subtab-'+id).classList.add('active');
+  document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('subtab-' + id).classList.add('active');
   btn.classList.add('active');
 }
 
@@ -599,24 +590,30 @@ async function addByURL() {
   const title   = document.getElementById('url-title').value.trim();
   const section = document.getElementById('url-section').value;
   const url     = document.getElementById('url-input').value.trim();
-  if (!title||!url) { toast('Please fill in all fields','error'); return; }
+  if (!title || !url) { toast('Please fill in all fields', 'error'); return; }
   if (!url.match(/\.(mp3|wav|ogg|aac|m4a)(\?.*)?$/i)) {
-    toast('URL should point to an audio file (.mp3, .wav, etc.)','error'); return;
+    toast('URL should point to an audio file (.mp3, .wav, etc.)', 'error'); return;
   }
-  const { error } = await sb.from('tracks').insert({ title, url, section, active:true });
-  if (error) toast('Error adding track: '+error.message,'error');
+  const { error } = await sb.from('tracks').insert({ title, url, section, active: true });
+  if (error) toast('Error adding track: ' + error.message, 'error');
   else {
     toast('Track added successfully! ✓');
-    document.getElementById('url-title').value='';
-    document.getElementById('url-input').value='';
+    document.getElementById('url-title').value = '';
+    document.getElementById('url-input').value = '';
   }
 }
 
-function handleDrop(e) {
+// FIX: removed broken inline ondragover/ondrop attributes from HTML;
+// drag-and-drop is handled entirely by these JS listeners below.
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragging'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragging'));
+uploadZone.addEventListener('drop', e => {
   e.preventDefault();
+  uploadZone.classList.remove('dragging');
   const file = e.dataTransfer.files[0];
   if (file) processUploadFile(file);
-}
+});
 
 function handleFileSelect(e) {
   const file = e.target.files[0];
@@ -624,67 +621,70 @@ function handleFileSelect(e) {
 }
 
 async function processUploadFile(file) {
-  const section  = document.getElementById('file-section').value;
-  let title      = document.getElementById('file-title').value.trim();
-  if (!title) title = file.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
+  const section = document.getElementById('file-section').value;
+  let title     = document.getElementById('file-title').value.trim();
+  if (!title) title = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
 
   const bar    = document.getElementById('uploadProgressBar');
   const fill   = document.getElementById('uploadProgressFill');
   const status = document.getElementById('uploadStatus');
   bar.classList.add('show');
-  fill.style.width='10%';
-  status.textContent='Preparing file...';
+  fill.style.width = '10%';
+  status.textContent = 'Preparing file...';
 
   try {
     let uploadBlob = file;
     const isVideo  = file.type.startsWith('video/');
 
     if (isVideo) {
-      status.textContent='Extracting audio from video...';
-      fill.style.width='30%';
-      const arrayBuf = await file.arrayBuffer();
-      const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-      const decoded  = await audioCtx.decodeAudioData(arrayBuf);
-      uploadBlob     = audioBufferToWav(decoded);
-      status.textContent='Audio extracted. Uploading...';
+      // FIX: wrap in try/catch with clear browser-support message
+      try {
+        status.textContent = 'Extracting audio from video...';
+        fill.style.width = '30%';
+        const arrayBuf = await file.arrayBuffer();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const decoded  = await audioCtx.decodeAudioData(arrayBuf);
+        uploadBlob     = audioBufferToWav(decoded);
+        status.textContent = 'Audio extracted. Uploading...';
+      } catch (decodeErr) {
+        throw new Error('Could not extract audio from this video. Try exporting the audio as MP3 first.');
+      }
     } else {
-      status.textContent='Uploading audio...';
+      status.textContent = 'Uploading audio...';
     }
 
-    fill.style.width='60%';
+    fill.style.width = '60%';
     const ext      = isVideo ? 'wav' : file.name.split('.').pop().toLowerCase();
-    const fileName = `${Date.now()}_${title.replace(/[^a-z0-9]/gi,'_').toLowerCase()}.${ext}`;
+    const fileName = `${Date.now()}_${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${ext}`;
     const filePath = `${section}/${fileName}`;
 
     const { error: upErr } = await sb.storage.from('audio-files').upload(filePath, uploadBlob, {
       contentType: isVideo ? 'audio/wav' : file.type,
       upsert: false
     });
-
     if (upErr) throw upErr;
-    fill.style.width='85%';
 
+    fill.style.width = '85%';
     const { data: pubData } = sb.storage.from('audio-files').getPublicUrl(filePath);
     const publicUrl = pubData.publicUrl;
 
     const { error: dbErr } = await sb.from('tracks').insert({
       title, url: publicUrl, section, active: true, file_path: filePath
     });
-
     if (dbErr) throw dbErr;
-    fill.style.width='100%';
-    status.textContent='Upload complete! ✓';
+
+    fill.style.width = '100%';
+    status.textContent = 'Upload complete! ✓';
     toast('Track uploaded and ready! ✓');
+    setTimeout(() => { bar.classList.remove('show'); fill.style.width = '0%'; status.textContent = ''; }, 2000);
+    document.getElementById('file-title').value = '';
+    document.getElementById('fileInput').value  = '';
 
-    setTimeout(()=>{ bar.classList.remove('show'); fill.style.width='0%'; status.textContent=''; }, 2000);
-    document.getElementById('file-title').value='';
-    document.getElementById('fileInput').value='';
-
-  } catch(err) {
-    toast('Upload failed: '+err.message,'error');
+  } catch (err) {
+    toast('Upload failed: ' + err.message, 'error');
     bar.classList.remove('show');
-    fill.style.width='0%';
-    status.textContent='';
+    fill.style.width = '0%';
+    status.textContent = '';
   }
 }
 
@@ -692,26 +692,26 @@ function audioBufferToWav(buffer) {
   const numCh = buffer.numberOfChannels;
   const sr    = buffer.sampleRate;
   const len   = buffer.length;
-  const wav   = new ArrayBuffer(44 + len*numCh*2);
+  const wav   = new ArrayBuffer(44 + len * numCh * 2);
   const view  = new DataView(wav);
-  const ws    = (o,s)=>{ for(let i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i)); };
-  ws(0,'RIFF'); view.setUint32(4,36+len*numCh*2,true); ws(8,'WAVE'); ws(12,'fmt ');
-  view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,numCh,true);
-  view.setUint32(24,sr,true); view.setUint32(28,sr*numCh*2,true);
-  view.setUint16(32,numCh*2,true); view.setUint16(34,16,true); ws(36,'data');
-  view.setUint32(40,len*numCh*2,true);
-  let offset=44;
-  for(let i=0;i<len;i++) for(let ch=0;ch<numCh;ch++) {
-    const s=buffer.getChannelData(ch)[i];
-    view.setInt16(offset,s<0?s*0x8000:s*0x7FFF,true); offset+=2;
+  const ws    = (o, s) => { for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
+  ws(0, 'RIFF'); view.setUint32(4, 36 + len * numCh * 2, true); ws(8, 'WAVE'); ws(12, 'fmt ');
+  view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, numCh, true);
+  view.setUint32(24, sr, true); view.setUint32(28, sr * numCh * 2, true);
+  view.setUint16(32, numCh * 2, true); view.setUint16(34, 16, true); ws(36, 'data');
+  view.setUint32(40, len * numCh * 2, true);
+  let offset = 44;
+  for (let i = 0; i < len; i++) for (let ch = 0; ch < numCh; ch++) {
+    const s = buffer.getChannelData(ch)[i];
+    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true); offset += 2;
   }
-  return new Blob([wav],{type:'audio/wav'});
+  return new Blob([wav], { type: 'audio/wav' });
 }
 
 async function loadScheduleBlocks() {
   const { data } = await sb.from('schedule_blocks').select('*').order('start_hour');
   const container = document.getElementById('schedule-blocks-list');
-  container.innerHTML = (data||[]).map(b=>`
+  container.innerHTML = (data || []).map(b => `
     <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;
       padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;
       justify-content:space-between;gap:12px;transition:background 200ms">
@@ -724,7 +724,7 @@ async function loadScheduleBlocks() {
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <label class="toggle">
-          <input type="checkbox" ${b.active?'checked':''} onchange="toggleScheduleBlock('${b.id}',this.checked)"/>
+          <input type="checkbox" ${b.active ? 'checked' : ''} onchange="toggleScheduleBlock('${b.id}',this.checked)"/>
           <span class="toggle-slider"></span>
         </label>
         <button class="btn-sm btn-danger" onclick="deleteScheduleBlock('${b.id}')">🗑</button>
@@ -737,24 +737,24 @@ async function saveScheduleBlock() {
   const start_hour = parseInt(document.getElementById('sched-start').value);
   const end_hour   = parseInt(document.getElementById('sched-end').value);
   const daysSel    = document.getElementById('sched-days');
-  const days       = Array.from(daysSel.selectedOptions).map(o=>o.value);
+  const days       = Array.from(daysSel.selectedOptions).map(o => o.value);
 
-  if (end_hour <= start_hour) { toast('End hour must be greater than start hour','error'); return; }
-  if (!days.length) { toast('Select at least one day','error'); return; }
+  if (end_hour <= start_hour) { toast('End hour must be greater than start hour', 'error'); return; }
+  if (!days.length) { toast('Select at least one day', 'error'); return; }
 
-  const { error } = await sb.from('schedule_blocks').insert({ section, start_hour, end_hour, days, active:true });
-  if (error) toast('Error saving block: '+error.message,'error');
+  const { error } = await sb.from('schedule_blocks').insert({ section, start_hour, end_hour, days, active: true });
+  if (error) toast('Error saving block: ' + error.message, 'error');
   else { toast('Schedule block saved! ✓'); await loadScheduleBlocks(); }
 }
 
 async function toggleScheduleBlock(id, val) {
-  await sb.from('schedule_blocks').update({active:val}).eq('id',id);
-  toast(val?'Block enabled ✓':'Block disabled');
+  await sb.from('schedule_blocks').update({ active: val }).eq('id', id);
+  toast(val ? 'Block enabled ✓' : 'Block disabled');
 }
 
 async function deleteScheduleBlock(id) {
   if (!confirm('Delete this schedule block?')) return;
-  await sb.from('schedule_blocks').delete().eq('id',id);
+  await sb.from('schedule_blocks').delete().eq('id', id);
   toast('Block deleted');
   await loadScheduleBlocks();
 }
@@ -762,24 +762,24 @@ async function deleteScheduleBlock(id) {
 async function loadSettingsForm() {
   const { data } = await sb.from('settings').select('key,value');
   const s = {};
-  (data||[]).forEach(r=>s[r.key]=r.value);
-  document.getElementById('set-title').value     = s.site_title||'';
-  document.getElementById('set-wa').value        = s.whatsapp_number||'';
-  document.getElementById('set-prayer').value    = s.prayer_url||'';
-  document.getElementById('set-testimony').value = s.testimony_url||'';
-  document.getElementById('set-donate').value    = s.donate_url||'';
+  (data || []).forEach(r => s[r.key] = r.value);
+  document.getElementById('set-title').value     = s.site_title || '';
+  document.getElementById('set-wa').value        = s.whatsapp_number || '';
+  document.getElementById('set-prayer').value    = s.prayer_url || '';
+  document.getElementById('set-testimony').value = s.testimony_url || '';
+  document.getElementById('set-donate').value    = s.donate_url || '';
 }
 
 async function saveSettings() {
   const rows = [
-    { key:'site_title',      value: document.getElementById('set-title').value },
-    { key:'whatsapp_number', value: document.getElementById('set-wa').value },
-    { key:'prayer_url',      value: document.getElementById('set-prayer').value },
-    { key:'testimony_url',   value: document.getElementById('set-testimony').value },
-    { key:'donate_url',      value: document.getElementById('set-donate').value },
+    { key: 'site_title',      value: document.getElementById('set-title').value },
+    { key: 'whatsapp_number', value: document.getElementById('set-wa').value },
+    { key: 'prayer_url',      value: document.getElementById('set-prayer').value },
+    { key: 'testimony_url',   value: document.getElementById('set-testimony').value },
+    { key: 'donate_url',      value: document.getElementById('set-donate').value },
   ];
   for (const row of rows) {
-    await sb.from('settings').upsert(row, {onConflict:'key'});
+    await sb.from('settings').upsert(row, { onConflict: 'key' });
   }
   toast('Settings saved! ✓');
 }
@@ -787,27 +787,23 @@ async function saveSettings() {
 async function changePassword() {
   const newPwd  = document.getElementById('new-pwd').value;
   const confPwd = document.getElementById('confirm-pwd').value;
-  if (!newPwd) { toast('Enter a new password','error'); return; }
-  if (newPwd !== confPwd) { toast('Passwords do not match','error'); return; }
-  if (newPwd.length < 8) { toast('Password must be at least 8 characters','error'); return; }
+  if (!newPwd) { toast('Enter a new password', 'error'); return; }
+  if (newPwd !== confPwd) { toast('Passwords do not match', 'error'); return; }
+  if (newPwd.length < 8) { toast('Password must be at least 8 characters', 'error'); return; }
   const hash = await sha256(newPwd);
-  await sb.from('settings').upsert({key:'admin_password_hash',value:hash},{onConflict:'key'});
+  await sb.from('settings').upsert({ key: 'admin_password_hash', value: hash }, { onConflict: 'key' });
   toast('Password updated! ✓');
-  document.getElementById('new-pwd').value='';
-  document.getElementById('confirm-pwd').value='';
+  document.getElementById('new-pwd').value    = '';
+  document.getElementById('confirm-pwd').value = '';
 }
 
 async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-const uploadZone = document.getElementById('uploadZone');
-uploadZone.addEventListener('dragover', e=>{ e.preventDefault(); uploadZone.classList.add('dragging'); });
-uploadZone.addEventListener('dragleave', ()=>uploadZone.classList.remove('dragging'));
-uploadZone.addEventListener('drop', e=>{ e.preventDefault(); uploadZone.classList.remove('dragging'); handleDrop(e); });
-
-checkAuth().then(()=>loadDashboard());
+// Auth check then load dashboard
+checkAuth().then(() => loadDashboard());
 </script>
 </body>
 </html>
