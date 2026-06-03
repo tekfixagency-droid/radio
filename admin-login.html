@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MasalioRadio Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#0f0a1e;font-family:Inter,system-ui,sans-serif;color:#fff;padding:20px}
+.login-card{width:100%;max-width:380px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,216,155,.3);border-radius:16px;padding:40px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.logo{text-align:center;margin-bottom:32px}
+.logo h1{font-size:24px;font-weight:800;color:#ffd89b}
+.logo p{font-size:13px;color:#9796f0;margin-top:4px}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:12px;color:#e8d5ff;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.field input{width:100%;padding:12px 16px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;
+  font-size:14px;font-family:inherit;outline:none;transition:border-color 200ms}
+.field input:focus{border-color:#ffd89b}
+.btn{width:100%;padding:14px;background:linear-gradient(90deg,#ffd89b,#ff6b95);
+  color:#1a0a2e;border:none;border-radius:8px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:all 200ms}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,107,149,.4)}
+.error{background:rgba(255,107,149,.15);border:1px solid rgba(255,107,149,.4);
+  border-radius:8px;padding:12px;font-size:13px;color:#ff6b95;margin-top:16px;display:none}
+.error.show{display:block}
+</style>
+</head>
+<body>
+<div class="login-card">
+  <div class="logo">
+    <h1>MasalioRadio</h1>
+    <p>Admin Dashboard</p>
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="pwd" placeholder="Enter admin password" autocomplete="current-password"/>
+  </div>
+  <button class="btn" onclick="doLogin()">Sign In</button>
+  <div class="error" id="errMsg">Incorrect password. Please try again.</div>
+</div>
+<script>
+const SUPABASE_URL = 'https://rgibefpnbjjazuqnucvq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnaWJlZnBuYmpqYXp1cW51Y3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NzE4NTUsImV4cCI6MjA5NjA0Nzg1NX0.7z2LGFg1QAx-i1hNVBK3H6-MAAMAWzQXbtzagSU9MW0';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Check if already logged in
+const token = sessionStorage.getItem('adminToken');
+if (token) window.location.href = 'admin.html';
+
+document.getElementById('pwd').addEventListener('keypress', e => { if(e.key==='Enter') doLogin(); });
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function doLogin() {
+  const pwd = document.getElementById('pwd').value;
+  if (!pwd) return;
+  const hash = await sha256(pwd);
+  const { data } = await sb.from('settings').select('value').eq('key','admin_password_hash').single();
+  if (data && data.value === hash) {
+    const token = crypto.randomUUID();
+    const expires = new Date(Date.now() + 8*3600*1000).toISOString();
+    await sb.from('admin_sessions').insert({ token, expires_at: expires });
+    sessionStorage.setItem('adminToken', token);
+    window.location.href = 'admin.html';
+  } else {
+    document.getElementById('errMsg').classList.add('show');
+    setTimeout(()=> document.getElementById('errMsg').classList.remove('show'), 3000);
+  }
+}
+</script>
+</body>
+</html>

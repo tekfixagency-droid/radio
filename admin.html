@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — MasalioRadio</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+:root{--bg:#0f0a1e;--card:rgba(255,255,255,.04);--border:rgba(255,255,255,.1);
+  --accent:#ffd89b;--accent2:#ff6b95;--accent3:#9796f0;--text:#fff;--muted:#9ca3af}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh;display:flex}
+.sidebar{width:220px;background:rgba(0,0,0,.4);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:20px 0;flex-shrink:0;min-height:100vh}
+.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.sidebar-logo h2{font-size:16px;font-weight:800;color:var(--accent)}
+.sidebar-logo p{font-size:11px;color:var(--accent3);margin-top:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;
+  font-size:13px;font-weight:600;color:var(--muted);border-left:2px solid transparent;transition:all 200ms}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(255,216,155,.06)}
+.nav-icon{font-size:16px;min-width:20px}
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border)}
+.logout-btn{width:100%;padding:8px;background:rgba(255,107,149,.1);border:1px solid rgba(255,107,149,.3);
+  border-radius:6px;color:#ff6b95;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.content{flex:1;padding:24px;overflow-y:auto}
+.page{display:none}.page.active{display:block}
+.page-title{font-size:20px;font-weight:800;color:var(--accent);margin-bottom:20px}
+
+/* CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.stat-num{font-size:32px;font-weight:800;color:var(--accent)}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.stat-icon{position:absolute;right:16px;top:16px;font-size:24px;opacity:.3}
+
+/* TABLE */
+.track-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:16px;
+  border-bottom:1px solid var(--border)}
+.table-header h3{font-size:14px;font-weight:700;color:var(--accent)}
+.search-input{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);padding:8px 12px;font-size:13px;font-family:inherit;outline:none;width:200px}
+.search-input:focus{border-color:var(--accent)}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:10px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge.music{background:rgba(255,216,155,.15);color:var(--accent);border:1px solid rgba(255,216,155,.3)}
+.badge.sermons{background:rgba(151,150,240,.15);color:var(--accent3);border:1px solid rgba(151,150,240,.3)}
+.badge.kids{background:rgba(255,107,149,.15);color:var(--accent2);border:1px solid rgba(255,107,149,.3)}
+.toggle{position:relative;display:inline-block;width:36px;height:20px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.2);border-radius:10px;transition:.3s}
+.toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;
+  background:#fff;border-radius:50%;transition:.3s}
+input:checked+.toggle-slider{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+input:checked+.toggle-slider::before{transform:translateX(16px)}
+.btn-sm{padding:5px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;font-family:inherit;transition:all 150ms}
+.btn-danger{background:rgba(255,107,149,.1);border-color:rgba(255,107,149,.4);color:var(--accent2)}
+.btn-danger:hover{background:rgba(255,107,149,.2)}
+.btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent2));border:none;color:#1a0a2e}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-secondary{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:var(--text)}
+
+/* FORMS */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+.form-card h3{font-size:14px;font-weight:700;color:var(--accent);margin-bottom:16px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-row.full{grid-template-columns:1fr}
+.form-field label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.form-field input,.form-field select,.form-field textarea{width:100%;padding:10px 12px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color 200ms}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--accent)}
+.form-field select option{background:#1a0a2e}
+.form-field textarea{resize:vertical;min-height:80px}
+.btn-full{width:100%;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 200ms;background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border:none;color:#1a0a2e;margin-top:4px}
+.btn-full:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,107,149,.4)}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed rgba(255,216,155,.3);border-radius:8px;padding:32px;
+  text-align:center;cursor:pointer;transition:all 200ms;background:rgba(255,216,155,.02)}
+.upload-zone:hover,.upload-zone.dragging{border-color:var(--accent);background:rgba(255,216,155,.05)}
+.upload-zone-icon{font-size:48px;margin-bottom:12px}
+.upload-zone p{font-size:13px;color:var(--muted)}
+.upload-zone strong{color:var(--accent)}
+.progress-bar{width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin-top:12px;overflow:hidden;display:none}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 300ms;width:0%}
+.progress-bar.show{display:block}
+
+/* SCHEDULE GRID */
+.schedule-grid{display:grid;grid-template-columns:80px repeat(24,1fr);gap:2px;font-size:10px;overflow-x:auto}
+.sched-header{padding:4px 2px;text-align:center;color:var(--muted);font-weight:600}
+.sched-label{padding:4px 8px;color:var(--muted);font-weight:600;display:flex;align-items:center}
+.sched-cell{height:32px;border-radius:3px;background:rgba(255,255,255,.05);cursor:pointer;transition:all 150ms}
+.sched-cell.music{background:rgba(255,216,155,.3);border:1px solid rgba(255,216,155,.5)}
+.sched-cell.sermons{background:rgba(151,150,240,.3);border:1px solid rgba(151,150,240,.5)}
+.sched-cell.kids{background:rgba(255,107,149,.3);border:1px solid rgba(255,107,149,.5)}
+.sched-cell:hover{opacity:.8;transform:scale(1.05)}
+.sched-legend{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.sched-leg-item{display:flex;align-items:center;gap:6px;font-size:12px}
+.sched-leg-dot{width:12px;height:12px;border-radius:3px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;
+  font-size:13px;font-weight:600;z-index:9999;animation:toastIn 300ms ease;
+  box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.success{background:rgba(37,211,102,.9);color:#fff}
+.toast.error{background:rgba(255,107,149,.9);color:#fff}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.tab-btns{display:flex;gap:8px;margin-bottom:16px}
+.tab-btn{padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;
+  border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;transition:all 150ms}
+.tab-btn.active{background:var(--card);color:var(--accent);border-color:rgba(255,216,155,.4)}
+.sub-tab{display:none}.sub-tab.active{display:block}
+
+.section-filter{display:flex;gap:8px;margin-bottom:16px}
+.filter-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;
+  border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;transition:all 150ms}
+.filter-btn.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#1a0a2e;border:none}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .form-row{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h2>MasalioRadio</h2>
+    <p>Admin Panel</p>
+  </div>
+  <div class="nav-item active" onclick="showPage('dashboard',this)">
+    <span class="nav-icon">&#128202;</span> Dashboard
+  </div>
+  <div class="nav-item" onclick="showPage('tracks',this)">
+    <span class="nav-icon">&#127925;</span> Tracks
+  </div>
+  <div class="nav-item" onclick="showPage('upload',this)">
+    <span class="nav-icon">&#11014;&#65039;</span> Upload
+  </div>
+  <div class="nav-item" onclick="showPage('schedule',this)">
+    <span class="nav-icon">&#128197;</span> Schedule
+  </div>
+  <div class="nav-item" onclick="showPage('settings',this)">
+    <span class="nav-icon">&#9881;&#65039;</span> Settings
+  </div>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="doLogout()">&#128275; Sign Out</button>
+  </div>
+</nav>
+
+<main class="content">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-title">&#128202; Dashboard</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-music">—</div>
+        <div class="stat-lbl">Music Tracks</div>
+        <div class="stat-icon">&#127925;</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-sermons">—</div>
+        <div class="stat-lbl">Sermons</div>
+        <div class="stat-icon">&#127908;</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-kids">—</div>
+        <div class="stat-lbl">Kids Tracks</div>
+        <div class="stat-icon">&#128102;</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-plays">—</div>
+        <div class="stat-lbl">Plays Today</div>
+        <div class="stat-icon">&#9654;&#65039;</div>
+      </div>
+    </div>
+    <div class="track-table-wrap">
+      <div class="table-header"><h3>&#128336; Recent Plays</h3></div>
+      <table>
+        <thead><tr><th>Track</th><th>Section</th><th>Played At</th></tr></thead>
+        <tbody id="recent-plays-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TRACKS -->
+  <div class="page" id="page-tracks">
+    <div class="page-title">&#127925; Track Manager</div>
+    <div class="section-filter">
+      <button class="filter-btn active" onclick="filterTracks('all',this)">All</button>
+      <button class="filter-btn" onclick="filterTracks('music',this)">Music</button>
+      <button class="filter-btn" onclick="filterTracks('sermons',this)">Sermons</button>
+      <button class="filter-btn" onclick="filterTracks('kids',this)">Kids</button>
+    </div>
+    <div class="track-table-wrap">
+      <div class="table-header">
+        <h3>All Tracks</h3>
+        <input type="text" class="search-input" id="trackSearch" placeholder="Search tracks..." oninput="renderTracks()"/>
+      </div>
+      <table>
+        <thead><tr><th>#</th><th>Title</th><th>Section</th><th>Active</th><th>Actions</th></tr></thead>
+        <tbody id="tracks-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="page" id="page-upload">
+    <div class="page-title">&#11014;&#65039; Add Tracks</div>
+    <div class="tab-btns">
+      <button class="tab-btn active" onclick="switchUploadTab('url',this)">&#128279; Add by URL</button>
+      <button class="tab-btn" onclick="switchUploadTab('file',this)">&#128190; Upload File</button>
+    </div>
+
+    <!-- URL TAB -->
+    <div class="sub-tab active" id="subtab-url">
+      <div class="form-card">
+        <h3>&#128279; Add Track by .mp3 URL</h3>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Track Title</label>
+            <input type="text" id="url-title" placeholder="Enter track title"/>
+          </div>
+          <div class="form-field">
+            <label>Section</label>
+            <select id="url-section">
+              <option value="music">Music</option>
+              <option value="sermons">Sermons</option>
+              <option value="kids">Kids</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-field">
+            <label>Audio URL (.mp3)</label>
+            <input type="url" id="url-input" placeholder="https://example.com/song.mp3"/>
+          </div>
+        </div>
+        <button class="btn-full" onclick="addByURL()">&#10003; Validate & Add Track</button>
+      </div>
+    </div>
+
+    <!-- FILE TAB -->
+    <div class="sub-tab" id="subtab-file">
+      <div class="form-card">
+        <h3>&#128190; Upload Audio or Video File</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
+          Supported: MP3, WAV, OGG, MP4, WebM. Videos will have audio extracted. All files compressed to 128kbps MP3.
+        </p>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Track Title (leave blank to use filename)</label>
+            <input type="text" id="file-title" placeholder="Optional — auto-detected"/>
+          </div>
+          <div class="form-field">
+            <label>Section</label>
+            <select id="file-section">
+              <option value="music">Music</option>
+              <option value="sermons">Sermons</option>
+              <option value="kids">Kids</option>
+            </select>
+          </div>
+        </div>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
+          ondragover="e=>e.preventDefault()" ondrop="handleDrop(event)">
+          <div class="upload-zone-icon">&#127926;</div>
+          <p><strong>Click to choose file</strong> or drag and drop here</p>
+          <p style="font-size:11px;margin-top:6px">Max 50MB per file</p>
+          <div class="progress-bar" id="uploadProgressBar">
+            <div class="progress-bar-fill" id="uploadProgressFill"></div>
+          </div>
+          <p id="uploadStatus" style="font-size:12px;margin-top:8px;color:var(--accent)"></p>
+        </div>
+        <input type="file" id="fileInput" style="display:none" accept="audio/*,video/*" onchange="handleFileSelect(event)"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="page" id="page-schedule">
+    <div class="page-title">&#128197; Schedule Manager</div>
+    <div class="form-card">
+      <h3>Add Schedule Block</h3>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Section</label>
+          <select id="sched-section">
+            <option value="music">Music</option>
+            <option value="sermons">Sermons</option>
+            <option value="kids">Kids</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Days</label>
+          <select id="sched-days" multiple style="height:100px">
+            <option value="mon" selected>Monday</option>
+            <option value="tue" selected>Tuesday</option>
+            <option value="wed" selected>Wednesday</option>
+            <option value="thu" selected>Thursday</option>
+            <option value="fri" selected>Friday</option>
+            <option value="sat" selected>Saturday</option>
+            <option value="sun" selected>Sunday</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Start Hour (0–23)</label>
+          <input type="number" id="sched-start" min="0" max="23" value="0"/>
+        </div>
+        <div class="form-field">
+          <label>End Hour (1–24)</label>
+          <input type="number" id="sched-end" min="1" max="24" value="22"/>
+        </div>
+      </div>
+      <button class="btn-full" onclick="saveScheduleBlock()">&#10003; Save Block</button>
+    </div>
+
+    <div class="sched-legend">
+      <div class="sched-leg-item"><div class="sched-leg-dot" style="background:rgba(255,216,155,.5)"></div> Music</div>
+      <div class="sched-leg-item"><div class="sched-leg-dot" style="background:rgba(151,150,240,.5)"></div> Sermons</div>
+      <div class="sched-leg-item"><div class="sched-leg-dot" style="background:rgba(255,107,149,.5)"></div> Kids</div>
+    </div>
+    <div id="schedule-blocks-list"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="page-title">&#9881;&#65039; Settings</div>
+    <div class="form-card">
+      <h3>Site Configuration</h3>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Site Title</label>
+          <input type="text" id="set-title" placeholder="MasalioRadio"/>
+        </div>
+        <div class="form-field">
+          <label>WhatsApp Number</label>
+          <input type="text" id="set-wa" placeholder="254722628151"/>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-field">
+          <label>Prayer Requests URL</label>
+          <input type="url" id="set-prayer" placeholder="https://..."/>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-field">
+          <label>Testimonies URL</label>
+          <input type="url" id="set-testimony" placeholder="https://..."/>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-field">
+          <label>Donate URL</label>
+          <input type="url" id="set-donate" placeholder="https://..."/>
+        </div>
+      </div>
+      <button class="btn-full" onclick="saveSettings()">&#10003; Save Settings</button>
+    </div>
+
+    <div class="form-card">
+      <h3>Change Admin Password</h3>
+      <div class="form-row">
+        <div class="form-field">
+          <label>New Password</label>
+          <input type="password" id="new-pwd" placeholder="Enter new password"/>
+        </div>
+        <div class="form-field">
+          <label>Confirm Password</label>
+          <input type="password" id="confirm-pwd" placeholder="Repeat new password"/>
+        </div>
+      </div>
+      <button class="btn-full" onclick="changePassword()">&#128275; Update Password</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const SUPABASE_URL = 'https://rgibefpnbjjazuqnucvq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnaWJlZnBuYmpqYXp1cW51Y3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NzE4NTUsImV4cCI6MjA5NjA0Nzg1NX0.7z2LGFg1QAx-i1hNVBK3H6-MAAMAWzQXbtzagSU9MW0';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let allTracks = [];
+let currentFilter = 'all';
+
+// ── AUTH CHECK ────────────────────────────────────────────────────────────────
+async function checkAuth() {
+  const token = sessionStorage.getItem('adminToken');
+  if (!token) { window.location.href='admin-login.html'; return; }
+  const { data } = await sb.from('admin_sessions').select('*').eq('token',token).single();
+  if (!data || new Date(data.expires_at) < new Date()) {
+    sessionStorage.removeItem('adminToken');
+    window.location.href='admin-login.html';
+  }
+}
+
+function doLogout() {
+  const token = sessionStorage.getItem('adminToken');
+  if (token) sb.from('admin_sessions').delete().eq('token',token).then(()=>{});
+  sessionStorage.removeItem('adminToken');
+  window.location.href='admin-login.html';
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  if (id==='tracks') loadTracks();
+  if (id==='dashboard') loadDashboard();
+  if (id==='schedule') loadScheduleBlocks();
+  if (id==='settings') loadSettingsForm();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const { data: tracks } = await sb.from('tracks').select('section, active');
+  const music   = (tracks||[]).filter(t=>t.section==='music'&&t.active).length;
+  const sermons = (tracks||[]).filter(t=>t.section==='sermons'&&t.active).length;
+  const kids    = (tracks||[]).filter(t=>t.section==='kids'&&t.active).length;
+  document.getElementById('stat-music').textContent = music;
+  document.getElementById('stat-sermons').textContent = sermons;
+  document.getElementById('stat-kids').textContent = kids;
+
+  const today = new Date().toISOString().split('T')[0];
+  const { count } = await sb.from('play_events').select('*',{count:'exact',head:true})
+    .gte('played_at', today+'T00:00:00');
+  document.getElementById('stat-plays').textContent = count||0;
+
+  const { data: plays } = await sb.from('play_events').select('played_at, section, tracks(title)')
+    .order('played_at',{ascending:false}).limit(20);
+  const tbody = document.getElementById('recent-plays-body');
+  tbody.innerHTML = (plays||[]).map(p=>`
+    <tr>
+      <td>${p.tracks?.title||'Unknown'}</td>
+      <td><span class="badge ${p.section}">${p.section}</span></td>
+      <td style="color:var(--muted);font-size:11px">${new Date(p.played_at).toLocaleString()}</td>
+    </tr>`).join('');
+}
+
+// ── TRACKS ────────────────────────────────────────────────────────────────────
+async function loadTracks() {
+  const { data } = await sb.from('tracks').select('*').order('section').order('created_at',{ascending:false});
+  allTracks = data||[];
+  renderTracks();
+}
+
+function filterTracks(section, btn) {
+  currentFilter = section;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTracks();
+}
+
+function renderTracks() {
+  const q = document.getElementById('trackSearch').value.toLowerCase();
+  const filtered = allTracks.filter(t => {
+    const sectionMatch = currentFilter==='all' || t.section===currentFilter;
+    const searchMatch  = !q || t.title.toLowerCase().includes(q) || t.url.toLowerCase().includes(q);
+    return sectionMatch && searchMatch;
+  });
+  document.getElementById('tracks-body').innerHTML = filtered.map((t,i)=>`
+    <tr>
+      <td style="color:var(--muted);width:40px">${i+1}</td>
+      <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.title}">${t.title}</td>
+      <td><span class="badge ${t.section}">${t.section}</span></td>
+      <td>
+        <label class="toggle">
+          <input type="checkbox" ${t.active?'checked':''} onchange="toggleActive('${t.id}',this.checked)"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+      <td>
+        <button class="btn-sm btn-danger" onclick="deleteTrack('${t.id}','${t.file_path||''}')">&#128465;</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function toggleActive(id, val) {
+  const { error } = await sb.from('tracks').update({active:val}).eq('id',id);
+  if (error) toast('Error updating track','error');
+  else toast(val?'Track enabled':'Track disabled');
+}
+
+async function deleteTrack(id, filePath) {
+  if (!confirm('Delete this track? This cannot be undone.')) return;
+  if (filePath) await sb.storage.from('audio-files').remove([filePath]);
+  const { error } = await sb.from('tracks').delete().eq('id',id);
+  if (error) toast('Delete failed','error');
+  else { toast('Track deleted'); await loadTracks(); }
+}
+
+// ── UPLOAD TABS ───────────────────────────────────────────────────────────────
+function switchUploadTab(id, btn) {
+  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('subtab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── ADD BY URL ────────────────────────────────────────────────────────────────
+async function addByURL() {
+  const title   = document.getElementById('url-title').value.trim();
+  const section = document.getElementById('url-section').value;
+  const url     = document.getElementById('url-input').value.trim();
+  if (!title||!url) { toast('Please fill in all fields','error'); return; }
+  if (!url.match(/\.(mp3|wav|ogg|aac|m4a)(\?.*)?$/i)) {
+    toast('URL should point to an audio file (.mp3, .wav, etc.)','error'); return;
+  }
+  const { error } = await sb.from('tracks').insert({ title, url, section, active:true });
+  if (error) toast('Error adding track: '+error.message,'error');
+  else {
+    toast('Track added successfully!');
+    document.getElementById('url-title').value='';
+    document.getElementById('url-input').value='';
+  }
+}
+
+// ── FILE UPLOAD ───────────────────────────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file) processUploadFile(file);
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) processUploadFile(file);
+}
+
+async function processUploadFile(file) {
+  const section  = document.getElementById('file-section').value;
+  let title      = document.getElementById('file-title').value.trim();
+  if (!title) title = file.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
+
+  const bar    = document.getElementById('uploadProgressBar');
+  const fill   = document.getElementById('uploadProgressFill');
+  const status = document.getElementById('uploadStatus');
+  bar.classList.add('show');
+  fill.style.width='10%';
+  status.textContent='Preparing file...';
+
+  try {
+    let uploadBlob = file;
+    const isVideo  = file.type.startsWith('video/');
+
+    if (isVideo) {
+      status.textContent='Extracting audio from video...';
+      fill.style.width='30%';
+      // For video files, we strip the audio track using the Web Audio API as a fallback
+      // Full ffmpeg.wasm conversion requires loading a large WASM binary
+      // This basic approach decodes the audio from video in the browser
+      const arrayBuf = await file.arrayBuffer();
+      const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const decoded  = await audioCtx.decodeAudioData(arrayBuf);
+      uploadBlob     = audioBufferToWav(decoded);
+      status.textContent='Audio extracted. Uploading...';
+    } else {
+      status.textContent='Uploading audio...';
+    }
+
+    fill.style.width='60%';
+    const ext      = isVideo ? 'wav' : file.name.split('.').pop().toLowerCase();
+    const fileName = `${Date.now()}_${title.replace(/[^a-z0-9]/gi,'_').toLowerCase()}.${ext}`;
+    const filePath = `${section}/${fileName}`;
+
+    const { error: upErr } = await sb.storage.from('audio-files').upload(filePath, uploadBlob, {
+      contentType: isVideo ? 'audio/wav' : file.type,
+      upsert: false
+    });
+
+    if (upErr) throw upErr;
+    fill.style.width='85%';
+
+    const { data: pubData } = sb.storage.from('audio-files').getPublicUrl(filePath);
+    const publicUrl = pubData.publicUrl;
+
+    const { error: dbErr } = await sb.from('tracks').insert({
+      title, url: publicUrl, section, active: true, file_path: filePath
+    });
+
+    if (dbErr) throw dbErr;
+    fill.style.width='100%';
+    status.textContent='Upload complete!';
+    toast('Track uploaded and ready!');
+
+    setTimeout(()=>{ bar.classList.remove('show'); fill.style.width='0%'; status.textContent=''; }, 2000);
+    document.getElementById('file-title').value='';
+    document.getElementById('fileInput').value='';
+
+  } catch(err) {
+    toast('Upload failed: '+err.message,'error');
+    bar.classList.remove('show');
+    fill.style.width='0%';
+    status.textContent='';
+  }
+}
+
+// Simple AudioBuffer to WAV converter
+function audioBufferToWav(buffer) {
+  const numCh = buffer.numberOfChannels;
+  const sr    = buffer.sampleRate;
+  const len   = buffer.length;
+  const wav   = new ArrayBuffer(44 + len*numCh*2);
+  const view  = new DataView(wav);
+  const ws    = (o,s)=>{ for(let i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i)); };
+  ws(0,'RIFF'); view.setUint32(4,36+len*numCh*2,true); ws(8,'WAVE'); ws(12,'fmt ');
+  view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,numCh,true);
+  view.setUint32(24,sr,true); view.setUint32(28,sr*numCh*2,true);
+  view.setUint16(32,numCh*2,true); view.setUint16(34,16,true); ws(36,'data');
+  view.setUint32(40,len*numCh*2,true);
+  let offset=44;
+  for(let i=0;i<len;i++) for(let ch=0;ch<numCh;ch++) {
+    const s=buffer.getChannelData(ch)[i];
+    view.setInt16(offset,s<0?s*0x8000:s*0x7FFF,true); offset+=2;
+  }
+  return new Blob([wav],{type:'audio/wav'});
+}
+
+// ── SCHEDULE ──────────────────────────────────────────────────────────────────
+async function loadScheduleBlocks() {
+  const { data } = await sb.from('schedule_blocks').select('*').order('start_hour');
+  const container = document.getElementById('schedule-blocks-list');
+  container.innerHTML = (data||[]).map(b=>`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div>
+        <span class="badge ${b.section}">${b.section}</span>
+        <span style="margin-left:10px;font-size:13px">Hours <strong>${b.start_hour}:00 – ${b.end_hour}:00</strong></span>
+        <span style="margin-left:10px;font-size:11px;color:var(--muted)">${b.days.join(', ')}</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <label class="toggle">
+          <input type="checkbox" ${b.active?'checked':''} onchange="toggleScheduleBlock('${b.id}',this.checked)"/>
+          <span class="toggle-slider"></span>
+        </label>
+        <button class="btn-sm btn-danger" onclick="deleteScheduleBlock('${b.id}')">&#128465;</button>
+      </div>
+    </div>`).join('') || '<p style="color:var(--muted);font-size:13px">No schedule blocks yet.</p>';
+}
+
+async function saveScheduleBlock() {
+  const section    = document.getElementById('sched-section').value;
+  const start_hour = parseInt(document.getElementById('sched-start').value);
+  const end_hour   = parseInt(document.getElementById('sched-end').value);
+  const daysSel    = document.getElementById('sched-days');
+  const days       = Array.from(daysSel.selectedOptions).map(o=>o.value);
+
+  if (end_hour <= start_hour) { toast('End hour must be greater than start hour','error'); return; }
+  if (!days.length) { toast('Select at least one day','error'); return; }
+
+  const { error } = await sb.from('schedule_blocks').insert({ section, start_hour, end_hour, days, active:true });
+  if (error) toast('Error saving block: '+error.message,'error');
+  else { toast('Schedule block saved!'); await loadScheduleBlocks(); }
+}
+
+async function toggleScheduleBlock(id, val) {
+  await sb.from('schedule_blocks').update({active:val}).eq('id',id);
+  toast(val?'Block enabled':'Block disabled');
+}
+
+async function deleteScheduleBlock(id) {
+  if (!confirm('Delete this schedule block?')) return;
+  await sb.from('schedule_blocks').delete().eq('id',id);
+  toast('Block deleted');
+  await loadScheduleBlocks();
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+async function loadSettingsForm() {
+  const { data } = await sb.from('settings').select('key,value');
+  const s = {};
+  (data||[]).forEach(r=>s[r.key]=r.value);
+  document.getElementById('set-title').value    = s.site_title||'';
+  document.getElementById('set-wa').value       = s.whatsapp_number||'';
+  document.getElementById('set-prayer').value   = s.prayer_url||'';
+  document.getElementById('set-testimony').value= s.testimony_url||'';
+  document.getElementById('set-donate').value   = s.donate_url||'';
+}
+
+async function saveSettings() {
+  const rows = [
+    { key:'site_title',       value: document.getElementById('set-title').value },
+    { key:'whatsapp_number',  value: document.getElementById('set-wa').value },
+    { key:'prayer_url',       value: document.getElementById('set-prayer').value },
+    { key:'testimony_url',    value: document.getElementById('set-testimony').value },
+    { key:'donate_url',       value: document.getElementById('set-donate').value },
+  ];
+  for (const row of rows) {
+    await sb.from('settings').upsert(row, {onConflict:'key'});
+  }
+  toast('Settings saved!');
+}
+
+async function changePassword() {
+  const newPwd  = document.getElementById('new-pwd').value;
+  const confPwd = document.getElementById('confirm-pwd').value;
+  if (!newPwd) { toast('Enter a new password','error'); return; }
+  if (newPwd !== confPwd) { toast('Passwords do not match','error'); return; }
+  if (newPwd.length < 8) { toast('Password must be at least 8 characters','error'); return; }
+  const hash = await sha256(newPwd);
+  await sb.from('settings').upsert({key:'admin_password_hash',value:hash},{onConflict:'key'});
+  toast('Password updated!');
+  document.getElementById('new-pwd').value='';
+  document.getElementById('confirm-pwd').value='';
+}
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── DRAG DROP ─────────────────────────────────────────────────────────────────
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', e=>{ e.preventDefault(); uploadZone.classList.add('dragging'); });
+uploadZone.addEventListener('dragleave', ()=>uploadZone.classList.remove('dragging'));
+uploadZone.addEventListener('drop', e=>{ e.preventDefault(); uploadZone.classList.remove('dragging'); handleDrop(e); });
+
+// ── START ─────────────────────────────────────────────────────────────────────
+checkAuth().then(()=>loadDashboard());
+</script>
+</body>
+</html>
