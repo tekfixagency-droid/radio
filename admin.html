@@ -17,27 +17,28 @@
   --accent4:#a78bfa;
   --text:#f0e6ff;
   --muted:#9ca3af;
-  --sidebar:#0a011a;
+  --sidebar:#000000;
   --grad:linear-gradient(90deg,#9333ea,#ec4899,#f97316);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{
-  background:linear-gradient(135deg,#0d0221 0%,#150833 50%,#0a1628 100%);
+  background:linear-gradient(135deg,#1a0440 0%,#2d0a6e 35%,#1a1060 65%,#0d1f4a 100%);
   color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh;display:flex;
   position:relative;overflow-x:hidden;
 }
-body::before{content:'';position:fixed;top:-20%;left:-10%;width:500px;height:500px;
-  background:radial-gradient(circle,rgba(147,51,234,.2) 0%,transparent 70%);pointer-events:none;z-index:0}
-body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:600px;height:600px;
-  background:radial-gradient(circle,rgba(236,72,153,.15) 0%,transparent 70%);pointer-events:none;z-index:0}
+body::before{content:'';position:fixed;top:-20%;left:-10%;width:600px;height:600px;
+  background:radial-gradient(circle,rgba(147,51,234,.35) 0%,transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:700px;height:700px;
+  background:radial-gradient(circle,rgba(236,72,153,.25) 0%,transparent 70%);pointer-events:none;z-index:0}
 
-.sidebar{width:230px;background:rgba(10,1,26,.85);backdrop-filter:blur(20px);
+.sidebar{width:230px;background:#000000;backdrop-filter:blur(20px);
   border-right:1px solid var(--border);display:flex;flex-direction:column;
   padding:20px 0;flex-shrink:0;min-height:100vh;position:relative;z-index:1}
 .sidebar-logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:12px}
 .logo-mark{width:44px;height:44px;background:var(--grad);border-radius:12px;
   display:flex;align-items:center;justify-content:center;font-size:20px;
-  margin-bottom:10px;box-shadow:0 6px 20px rgba(147,51,234,.5)}
+  margin-bottom:10px;box-shadow:0 6px 20px rgba(147,51,234,.5);overflow:hidden}
+.logo-mark img{width:100%;height:100%;object-fit:cover;border-radius:12px}
 .sidebar-logo h2{font-size:16px;font-weight:900;
   background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .sidebar-logo p{font-size:10px;color:var(--accent4);margin-top:2px;letter-spacing:1px;text-transform:uppercase}
@@ -64,9 +65,11 @@ body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:600px;height:
   display:inline-block}
 
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
-.stat-card{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;
-  padding:18px;position:relative;overflow:hidden;transition:transform 200ms,box-shadow 200ms;cursor:default}
-.stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(147,51,234,.2)}
+.stat-card{background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:14px;
+  padding:18px;position:relative;overflow:hidden;transition:transform 200ms,box-shadow 200ms;
+  cursor:pointer}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(147,51,234,.3)}
+.stat-card:active{transform:translateY(-1px)}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
 .stat-card:nth-child(1)::before{background:linear-gradient(90deg,#9333ea,#c084fc)}
 .stat-card:nth-child(2)::before{background:linear-gradient(90deg,#a78bfa,#818cf8)}
@@ -76,6 +79,8 @@ body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:600px;height:
   background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .stat-lbl{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;letter-spacing:.3px}
 .stat-icon{position:absolute;right:16px;top:16px;font-size:26px;opacity:.2}
+.stat-hint{position:absolute;bottom:10px;right:14px;font-size:9px;color:rgba(192,132,252,.5);
+  font-weight:600;letter-spacing:.5px;text-transform:uppercase}
 
 .track-table-wrap{background:rgba(255,255,255,.04);border:1px solid var(--border);
   border-radius:14px;overflow:hidden}
@@ -137,6 +142,11 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
 .form-field select option{background:#1a0533}
 .form-field textarea{resize:vertical;min-height:80px}
 
+.logo-preview{margin-top:10px;display:flex;align-items:center;gap:12px}
+.logo-preview img{width:48px;height:48px;border-radius:10px;object-fit:cover;
+  border:1px solid var(--border);background:rgba(255,255,255,.05)}
+.logo-preview span{font-size:11px;color:var(--muted)}
+
 .btn-full{width:100%;padding:13px;border-radius:9px;font-size:14px;font-weight:800;
   cursor:pointer;font-family:inherit;transition:all 200ms;
   background:var(--grad);border:none;color:#fff;margin-top:6px;
@@ -195,7 +205,7 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
 
 <nav class="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-mark">🎙️</div>
+    <div class="logo-mark" id="sidebarLogoMark">🎙️</div>
     <h2>MasalioRadio</h2>
     <p>Admin Panel</p>
   </div>
@@ -227,22 +237,25 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
   <div class="page active" id="page-dashboard">
     <div class="page-title">📊 Dashboard</div>
     <div class="stats-grid">
-      <div class="stat-card">
+      <div class="stat-card" onclick="goToTracksFiltered('music')">
         <div class="stat-num" id="stat-music">—</div>
         <div class="stat-lbl">Music Tracks</div>
         <div class="stat-icon">🎵</div>
+        <div class="stat-hint">View →</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" onclick="goToTracksFiltered('sermons')">
         <div class="stat-num" id="stat-sermons">—</div>
         <div class="stat-lbl">Sermons</div>
         <div class="stat-icon">🎤</div>
+        <div class="stat-hint">View →</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" onclick="goToTracksFiltered('kids')">
         <div class="stat-num" id="stat-kids">—</div>
         <div class="stat-lbl">Kids Tracks</div>
         <div class="stat-icon">👦</div>
+        <div class="stat-hint">View →</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" style="cursor:default">
         <div class="stat-num" id="stat-plays">—</div>
         <div class="stat-lbl">Plays Today</div>
         <div class="stat-icon">▶️</div>
@@ -261,10 +274,10 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
   <div class="page" id="page-tracks">
     <div class="page-title">🎵 Track Manager</div>
     <div class="section-filter">
-      <button class="filter-btn active" onclick="filterTracks('all',this)">All</button>
-      <button class="filter-btn" onclick="filterTracks('music',this)">Music</button>
-      <button class="filter-btn" onclick="filterTracks('sermons',this)">Sermons</button>
-      <button class="filter-btn" onclick="filterTracks('kids',this)">Kids</button>
+      <button class="filter-btn active" id="filter-all" onclick="filterTracks('all',this)">All</button>
+      <button class="filter-btn" id="filter-music" onclick="filterTracks('music',this)">Music</button>
+      <button class="filter-btn" id="filter-sermons" onclick="filterTracks('sermons',this)">Sermons</button>
+      <button class="filter-btn" id="filter-kids" onclick="filterTracks('kids',this)">Kids</button>
     </div>
     <div class="track-table-wrap">
       <div class="table-header">
@@ -317,7 +330,7 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
       <div class="form-card">
         <h3>💾 Upload Audio or Video File</h3>
         <p style="font-size:12px;color:var(--muted);margin-bottom:18px">
-          Supported: MP3, WAV, OGG, MP4, WebM. Videos will have audio extracted. All files compressed to 128kbps MP3.
+          Supported: MP3, WAV, OGG, MP4, WebM. Videos will have audio extracted.
         </p>
         <div class="form-row">
           <div class="form-field">
@@ -418,6 +431,16 @@ input:checked+.toggle-slider::before{transform:translateX(17px)}
       </div>
       <div class="form-row full">
         <div class="form-field">
+          <label>Logo Image URL (shown on client player)</label>
+          <input type="url" id="set-logo" placeholder="https://example.com/logo.png" oninput="previewLogo(this.value)"/>
+          <div class="logo-preview" id="logoPreview" style="display:none">
+            <img id="logoPreviewImg" src="" alt="Logo preview"/>
+            <span>Live preview — this will appear on the player page</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-field">
           <label>Prayer Requests URL</label>
           <input type="url" id="set-prayer" placeholder="https://..."/>
         </div>
@@ -484,10 +507,24 @@ function showPage(id, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   el.classList.add('active');
-  if (id === 'tracks')   loadTracks();
+  if (id === 'tracks')    loadTracks();
   if (id === 'dashboard') loadDashboard();
-  if (id === 'schedule') loadScheduleBlocks();
-  if (id === 'settings') loadSettingsForm();
+  if (id === 'schedule')  loadScheduleBlocks();
+  if (id === 'settings')  loadSettingsForm();
+}
+
+// Clicking a stat card navigates to Tracks filtered by section
+function goToTracksFiltered(section) {
+  const tracksNavItem = document.querySelectorAll('.nav-item')[1]; // Tracks nav item
+  showPage('tracks', tracksNavItem);
+  // Wait for tracks to load then apply filter
+  loadTracks().then(() => {
+    currentFilter = section;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('filter-' + section);
+    if (btn) btn.classList.add('active');
+    renderTracks();
+  });
 }
 
 function toast(msg, type = 'success') {
@@ -513,7 +550,6 @@ async function loadDashboard() {
     .gte('played_at', today + 'T00:00:00');
   document.getElementById('stat-plays').textContent = count || 0;
 
-  // FIX: use explicit foreign key hint track_id!inner to avoid ambiguous join
   const { data: plays } = await sb.from('play_events')
     .select('played_at, section, track_id, tracks!play_events_track_id_fkey(title)')
     .order('played_at', { ascending: false })
@@ -603,8 +639,6 @@ async function addByURL() {
   }
 }
 
-// FIX: removed broken inline ondragover/ondrop attributes from HTML;
-// drag-and-drop is handled entirely by these JS listeners below.
 const uploadZone = document.getElementById('uploadZone');
 uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragging'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragging'));
@@ -637,7 +671,6 @@ async function processUploadFile(file) {
     const isVideo  = file.type.startsWith('video/');
 
     if (isVideo) {
-      // FIX: wrap in try/catch with clear browser-support message
       try {
         status.textContent = 'Extracting audio from video...';
         fill.style.width = '30%';
@@ -714,12 +747,10 @@ async function loadScheduleBlocks() {
   container.innerHTML = (data || []).map(b => `
     <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;
       padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;
-      justify-content:space-between;gap:12px;transition:background 200ms">
+      justify-content:space-between;gap:12px">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span class="badge ${b.section}">${b.section}</span>
-        <span style="font-size:13px;font-weight:600">
-          ${b.start_hour}:00 – ${b.end_hour}:00
-        </span>
+        <span style="font-size:13px;font-weight:600">${b.start_hour}:00 – ${b.end_hour}:00</span>
         <span style="font-size:11px;color:var(--muted)">${b.days.join(', ')}</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -765,15 +796,35 @@ async function loadSettingsForm() {
   (data || []).forEach(r => s[r.key] = r.value);
   document.getElementById('set-title').value     = s.site_title || '';
   document.getElementById('set-wa').value        = s.whatsapp_number || '';
+  document.getElementById('set-logo').value      = s.logo_url || '';
   document.getElementById('set-prayer').value    = s.prayer_url || '';
   document.getElementById('set-testimony').value = s.testimony_url || '';
   document.getElementById('set-donate').value    = s.donate_url || '';
+  if (s.logo_url) previewLogo(s.logo_url);
+
+  // Update sidebar logo if set
+  if (s.logo_url) {
+    const mark = document.getElementById('sidebarLogoMark');
+    mark.innerHTML = `<img src="${s.logo_url}" alt="Logo"/>`;
+  }
+}
+
+function previewLogo(url) {
+  const preview = document.getElementById('logoPreview');
+  const img     = document.getElementById('logoPreviewImg');
+  if (url) {
+    img.src = url;
+    preview.style.display = 'flex';
+  } else {
+    preview.style.display = 'none';
+  }
 }
 
 async function saveSettings() {
   const rows = [
     { key: 'site_title',      value: document.getElementById('set-title').value },
     { key: 'whatsapp_number', value: document.getElementById('set-wa').value },
+    { key: 'logo_url',        value: document.getElementById('set-logo').value },
     { key: 'prayer_url',      value: document.getElementById('set-prayer').value },
     { key: 'testimony_url',   value: document.getElementById('set-testimony').value },
     { key: 'donate_url',      value: document.getElementById('set-donate').value },
@@ -782,6 +833,15 @@ async function saveSettings() {
     await sb.from('settings').upsert(row, { onConflict: 'key' });
   }
   toast('Settings saved! ✓');
+
+  // Refresh sidebar logo immediately after saving
+  const logoUrl = document.getElementById('set-logo').value;
+  const mark = document.getElementById('sidebarLogoMark');
+  if (logoUrl) {
+    mark.innerHTML = `<img src="${logoUrl}" alt="Logo"/>`;
+  } else {
+    mark.innerHTML = '🎙️';
+  }
 }
 
 async function changePassword() {
@@ -793,7 +853,7 @@ async function changePassword() {
   const hash = await sha256(newPwd);
   await sb.from('settings').upsert({ key: 'admin_password_hash', value: hash }, { onConflict: 'key' });
   toast('Password updated! ✓');
-  document.getElementById('new-pwd').value    = '';
+  document.getElementById('new-pwd').value     = '';
   document.getElementById('confirm-pwd').value = '';
 }
 
@@ -802,7 +862,6 @@ async function sha256(str) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Auth check then load dashboard
 checkAuth().then(() => loadDashboard());
 </script>
 </body>
